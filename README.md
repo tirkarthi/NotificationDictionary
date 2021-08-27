@@ -24,3 +24,7 @@ An Android application to display meaning of selected word as a notification.
 ## License
 
 MIT License
+
+## Screenshots
+
+![image](screenshots/browser.png) ![image](screenshots/notification_meaning.png) ![image](screenshots/meaning.png) 
