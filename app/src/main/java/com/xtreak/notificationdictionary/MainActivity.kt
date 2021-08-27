@@ -16,7 +16,6 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.*
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -47,9 +46,6 @@ class MainActivity : AppCompatActivity() {
         if (!file.exists()) {
             initialize_database()
         }
-
-        Log.d("NotificationDictionary: File path", file.absolutePath.toString())
-        Log.d("NotificationDictionary: File exists ", file.exists().toString())
 
         val mRecyclerView = findViewById<RecyclerView>(R.id.meaningRecyclerView)
         val linearLayoutManager = LinearLayoutManager(this)
@@ -119,7 +115,6 @@ class MainActivity : AppCompatActivity() {
         if (extras != null) {
             val word = extras.getString("NotificationWord")
             if (word != null) {
-                Log.e("Word from notification", word)
                 val wordEdit = findViewById<EditText>(R.id.wordInput)
                 val searchButton = findViewById<TextView>(R.id.searchButton)
 
