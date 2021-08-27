@@ -18,7 +18,7 @@
         android:focusableInTouchMode="true"
         android:hint="@string/word"
         android:inputType="textPersonName"
-        android:text="Airplane"
+        android:text="Hope"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
