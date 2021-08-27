@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Notification Dictionary</string>
+    <string name="channel_name">Dictionary</string>
+    <string name="channel_description">Dictionary notification</string>
+    <string name="word">Word</string>
+    <string name="about">About</string>
+    <string name="about_description">Notification Dictionary is an application to display meaning of selected word as
+        notification from all apps that support text selection. The app works offline and uses Wikitionary as a database for meanings.
+        Wikitionary is an open source project without which the app will not be possible. The logo was made possible thanks to liberal Apache
+        license of material design icons. Thanks to all the open source projects that helped in the application development
+    </string>
+    <string name="license">Licenses</string>
+</resources>
