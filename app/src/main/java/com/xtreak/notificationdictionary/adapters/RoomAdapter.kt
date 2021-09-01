@@ -18,6 +18,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import android.widget.Toast
+
+import android.content.ClipData
+import android.content.ClipboardManager
+
 
 class RoomAdapter(data: List<Word>, context: Context) :
     RecyclerView.Adapter<RoomAdapter.ViewHolder>() {
@@ -35,6 +40,7 @@ class RoomAdapter(data: List<Word>, context: Context) :
     ): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_layout, parent, false)
+
         return ViewHolder(view)
     }
 
@@ -45,6 +51,14 @@ class RoomAdapter(data: List<Word>, context: Context) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.lexicalCategory.text = formatHtml("<b> ${meaningList[position].lexicalCategory}")
         holder.wordMeaning.text = formatHtml("${meaningList[position].definition} <br>")
+
+        // https://stackoverflow.com/questions/43262912/copy-to-clipboard-the-content-of-a-cardview
+        holder.itemView.setOnClickListener(View.OnClickListener { view ->
+            val myClipboard = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val myClip = ClipData.newPlainText("label", meaningList[position].definition)
+            myClipboard.setPrimaryClip(myClip)
+            Toast.makeText(view.context, "Copied", Toast.LENGTH_SHORT).show()
+        })
     }
 
     override fun getItemCount(): Int {
