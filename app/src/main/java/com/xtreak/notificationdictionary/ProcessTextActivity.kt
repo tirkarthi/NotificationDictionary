@@ -57,6 +57,7 @@ class ProcessTextActivity : AppCompatActivity() {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setSound(null) // sound is set null but still the notification importance level seems to trigger sound
             .setAutoCancel(true)
+            .setTimeoutAfter(10000)
 
         val intent = Intent(
             context, MainActivity::class.java
