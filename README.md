@@ -2,6 +2,8 @@
 
 An Android application to display meaning of selected word as a notification.
 
+<a href='https://play.google.com/store/apps/details?id=com.xtreak.notificationdictionary'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height='70px'/></a>
+
 ## Features
 
 - Easy access from all apps that have text selection.
