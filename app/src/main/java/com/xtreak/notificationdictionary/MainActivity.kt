@@ -25,6 +25,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.suddenh4x.ratingdialog.AppRating
+import com.suddenh4x.ratingdialog.preferences.RatingThreshold
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -53,6 +55,15 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView.layoutManager = linearLayoutManager
 
         onNewIntent(intent)
+
+        AppRating.Builder(this)
+            .setMinimumLaunchTimes(10)
+            .setMinimumDays(2)
+            .setMinimumLaunchTimesToShowAgain(15)
+            .setMinimumDaysToShowAgain(10)
+            .setRatingThreshold(RatingThreshold.FIVE)
+            .useGoogleInAppReview()
+            .showIfMeetsConditions()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
