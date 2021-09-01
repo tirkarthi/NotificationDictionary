@@ -17,7 +17,7 @@
         <activity
             android:name=".ProcessTextActivity"
             android:exported="true"
-            android:label="meaning"
+            android:label="@string/process_text_label"
             android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
