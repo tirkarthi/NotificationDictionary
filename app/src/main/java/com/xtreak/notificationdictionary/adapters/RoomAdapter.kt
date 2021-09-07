@@ -10,18 +10,19 @@
 
 package com.xtreak.notificationdictionary
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.text.Html
 import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import android.widget.Toast
-
-import android.content.ClipData
-import android.content.ClipboardManager
+import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 
 
 class RoomAdapter(data: List<Word>, context: Context) :
@@ -52,9 +53,31 @@ class RoomAdapter(data: List<Word>, context: Context) :
         holder.lexicalCategory.text = formatHtml("<b> ${meaningList[position].lexicalCategory}")
         holder.wordMeaning.text = formatHtml("${meaningList[position].definition} <br>")
 
+        // https://stackoverflow.com/questions/13941093/how-to-share-entire-android-app-with-share-intent
+        holder.wordMeaning.setOnLongClickListener(View.OnLongClickListener { view ->
+            val sharingIntent = Intent(Intent.ACTION_SEND)
+            sharingIntent.type = "text/plain"
+            val shareBody =
+                "${meaningList[position].word!!.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                }} \n\n${meaningList[position].definition} \n\nSent via Notification Dictionary (https://play.google.com/store/apps/details?id=com.xtreak.notificationdictionary)"
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Meaning")
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+            context.applicationContext.startActivity(
+                Intent.createChooser(
+                    sharingIntent,
+                    "Share via"
+                )
+            )
+            true // Satisfy type checker
+        })
+
         // https://stackoverflow.com/questions/43262912/copy-to-clipboard-the-content-of-a-cardview
-        holder.itemView.setOnClickListener(View.OnClickListener { view ->
-            val myClipboard = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        holder.wordMeaning.setOnClickListener(View.OnClickListener { view ->
+            val myClipboard =
+                view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val myClip = ClipData.newPlainText("label", meaningList[position].definition)
             myClipboard.setPrimaryClip(myClip)
             Toast.makeText(view.context, "Copied", Toast.LENGTH_SHORT).show()

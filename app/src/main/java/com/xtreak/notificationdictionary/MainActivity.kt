@@ -21,14 +21,21 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.huxq17.download.Pump
+import com.huxq17.download.config.DownloadConfig
+import com.huxq17.download.core.DownloadListener
 import com.suddenh4x.ratingdialog.AppRating
 import com.suddenh4x.ratingdialog.preferences.RatingThreshold
+import de.cketti.library.changelog.ChangeLog
 import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.Executors
+import java.util.zip.ZipFile
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,12 +48,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         createNotificationChannel()
 
+
         val package_data_directory =
             Environment.getDataDirectory().absolutePath + "/data/" + packageName
         val file = File("$package_data_directory/databases/dictionary.db")
 
         if (!file.exists()) {
             initialize_database()
+        } else {
+            // If database is present and is an update then show the changelog
+            val changelog = ChangeLog(this)
+            if (changelog.isFirstRun) {
+                changelog.logDialog.show()
+            }
         }
 
         val mRecyclerView = findViewById<RecyclerView>(R.id.meaningRecyclerView)
@@ -85,35 +99,91 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+
+    private fun initProgressDialog(): ProgressDialog {
+        progress_dialog = ProgressDialog(this)
+        progress_dialog.setTitle("Downloading database for initial offline usage")
+        progress_dialog.progress = 0
+        progress_dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+        return progress_dialog
+    }
+
     private fun initialize_database() {
         // declare the dialog as a member field of your activity
         // ProgressDialog is deprecated in documentation to use ProgressBar.
         // But we don't want the user to cancel this. It's one time and takes a couple of seconds
-        val mProgressDialog: ProgressDialog
 
-        mProgressDialog = ProgressDialog(this@MainActivity)
-        mProgressDialog.setMessage("Initializing database. This will take a few seconds.")
-        mProgressDialog.isIndeterminate = true
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-        mProgressDialog.setCancelable(false)
-        mProgressDialog.show()
+        // TODO: Make this configurable based on environment?
+        val url = "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/dictionary.db.zip"
+        // val url = "http://192.168.0.105:8000/dictionary.db.zip" // for local testing
+        val progressDialog = initProgressDialog()
+        val package_data_directory =
+            Environment.getDataDirectory().absolutePath + "/data/" + packageName
+        val zip_path = File("$package_data_directory/dictionary.db.zip").absolutePath
 
-        // AsyncTask is deprecated : https://stackoverflow.com/questions/58767733/android-asynctask-api-deprecating-in-android-11-what-are-the-alternatives
-        // https://www.simplifiedcoding.net/android-asynctask/
-        val executor = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        executor.execute {
-            // A hack to copy database file from assets as part of DB initialization.
-            // This should ideally be a setup time task to copy file instead of doing it as a workaround.
-            val database = AppDatabase.getDatabase(this@MainActivity)
-            val dao = database.dictionaryDao()
-            dao.getAllMeaningsByWord("Hello")
+        // https://github.com/huxq17/Pump/blob/master/kotlin_app/src/main/java/com/huxq17/download/demo/MainActivity.kt
+        DownloadConfig.newBuilder()
+            .setMaxRunningTaskNum(1)
+            .setMinUsableStorageSpace(140 * 1024L * 1024) // 140MB as per database size
+            .build()
+        progressDialog.progress = 0
+        progressDialog.show()
+        Pump.newRequest(url, zip_path)
+            .listener(object : DownloadListener() {
 
-            handler.post {
-                mProgressDialog.dismiss()
-            }
-        }
+                override fun onProgress(progress: Int) {
+                    progressDialog.progress = progress
+                }
 
+                fun copy_and_unzip(source: String, destination: String) {
+                    val zipfile = ZipFile(source)
+                    val entry = zipfile.entries().toList().first()
+
+                    // The zip file only has one entry which is the database. So use it as an
+                    // input stream and copy the unzipped file to output stream. Delete the source
+                    // zip file to save space.
+                    val input_stream = zipfile.getInputStream(entry)
+                    val output_stream = FileOutputStream(destination)
+                    input_stream.copyTo(output_stream, 1024 * 1024 * 2)
+                    File(zip_path).delete()
+                }
+
+                override fun onSuccess() {
+                    val destination_folder = File("$package_data_directory/databases")
+                    val destination_path =
+                        File("$package_data_directory/databases/dictionary.db").absolutePath
+                    val source_path = downloadInfo.filePath
+
+                    if (!destination_folder.exists()) {
+                        destination_folder.mkdirs()
+                    }
+
+                    copy_and_unzip(source_path, destination_path)
+                    progressDialog.dismiss()
+                    Toast.makeText(this@MainActivity, "Download Finished", Toast.LENGTH_SHORT)
+                        .show()
+
+                    // Show changelog after download
+                    val changelog = ChangeLog(this@MainActivity)
+                    if (changelog.isFirstRun) {
+                        changelog.logDialog.show()
+                    }
+                }
+
+                override fun onFailed() {
+                    progressDialog.dismiss()
+                    Toast.makeText(this@MainActivity, "Download failed. Please check your internet connection and relaunch the app.", Toast.LENGTH_SHORT).show()
+                }
+            })
+            .forceReDownload(false)
+            .threadNum(3)
+            .setRetry(3, 200)
+            .submit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        applicationContext.cacheDir.deleteRecursively() // Delete cache on exit
     }
 
     override fun onNewIntent(intent: Intent) {
