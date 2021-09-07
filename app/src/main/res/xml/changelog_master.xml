@@ -10,6 +10,9 @@
   -->
 
 <changelog>
+    <release version="0.0.7" versioncode="7" >
+        <change>Fixed crash on long press to share in some devices.</change>
+    </release>
     <release version="0.0.5" versioncode="5" >
         <change>Long press on meaning to share word and meaning.</change>
         <change>Download dictionary from the CDN and reduce apk size.</change>

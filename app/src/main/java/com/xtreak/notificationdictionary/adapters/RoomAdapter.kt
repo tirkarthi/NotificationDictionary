@@ -56,20 +56,27 @@ class RoomAdapter(data: List<Word>, context: Context) :
         // https://stackoverflow.com/questions/13941093/how-to-share-entire-android-app-with-share-intent
         holder.wordMeaning.setOnLongClickListener(View.OnLongClickListener { view ->
             val sharingIntent = Intent(Intent.ACTION_SEND)
+            // https://stackoverflow.com/questions/3918517/calling-startactivity-from-outside-of-an-activity-context
+            sharingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             sharingIntent.type = "text/plain"
             val shareBody =
-                "${meaningList[position].word!!.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(
-                        Locale.getDefault()
-                    ) else it.toString()
-                }} \n\n${meaningList[position].definition} \n\nSent via Notification Dictionary (https://play.google.com/store/apps/details?id=com.xtreak.notificationdictionary)"
+                "${
+                    meaningList[position].word!!.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.getDefault()
+                        ) else it.toString()
+                    }
+                } \n\n${meaningList[position].definition} \n\nSent via Notification Dictionary (https://play.google.com/store/apps/details?id=com.xtreak.notificationdictionary)"
             sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Meaning")
             sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+            // https://stackoverflow.com/questions/62166087/using-intent-createchooser-and-getting-error-calling-startactivity-from-outsi
+            val chooserIntent = Intent.createChooser(
+                sharingIntent,
+                "Share via"
+            )
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.applicationContext.startActivity(
-                Intent.createChooser(
-                    sharingIntent,
-                    "Share via"
-                )
+                chooserIntent
             )
             true // Satisfy type checker
         })
