@@ -55,13 +55,13 @@ class MainActivity : AppCompatActivity() {
 
         if (!file.exists()) {
             initialize_database()
-        } else {
-            // If database is present and is an update then show the changelog
-            val changelog = ChangeLog(this)
-            if (changelog.isFirstRun) {
-                changelog.logDialog.show()
-            }
         }
+
+        val changelog = ChangeLog(this)
+        if (changelog.isFirstRun) {
+            changelog.logDialog.show()
+        }
+
 
         val mRecyclerView = findViewById<RecyclerView>(R.id.meaningRecyclerView)
         val linearLayoutManager = LinearLayoutManager(this)
@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         progress_dialog.setTitle("Downloading database for initial offline usage")
         progress_dialog.progress = 0
         progress_dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+        progress_dialog.setCancelable(false)
         return progress_dialog
     }
 
@@ -163,16 +164,15 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity, "Download Finished", Toast.LENGTH_SHORT)
                         .show()
 
-                    // Show changelog after download
-                    val changelog = ChangeLog(this@MainActivity)
-                    if (changelog.isFirstRun) {
-                        changelog.logDialog.show()
-                    }
                 }
 
                 override fun onFailed() {
                     progressDialog.dismiss()
-                    Toast.makeText(this@MainActivity, "Download failed. Please check your internet connection and relaunch the app.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Download failed. Please check your internet connection and relaunch the app.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
             .forceReDownload(false)
