@@ -11,9 +11,11 @@
 package com.xtreak.notificationdictionary
 
 import android.content.Context
+import android.os.Environment
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import java.io.File
 
 @Database(entities = [Word::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
@@ -25,9 +27,14 @@ abstract class AppDatabase : RoomDatabase() {
         // same time.
         @Volatile
         private var INSTANCE: AppDatabase? = null
-        private var DATABASE_DIR: String = "databases/dictionary.db"
+        private var DATABASE_DIR: String = "dictionary.db"
 
         fun getDatabase(context: Context): AppDatabase {
+
+            val package_data_directory =
+                Environment.getDataDirectory().absolutePath + "/data/" + context.packageName
+            val db_path = File("$package_data_directory/databases/dictionary.db")
+
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
@@ -35,7 +42,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context,
                     AppDatabase::class.java,
                     "dictionary.db"
-                ).createFromAsset(DATABASE_DIR).build()
+                ).createFromFile(db_path).build()
                 INSTANCE = instance
                 // return instance
                 instance
