@@ -12,10 +12,12 @@ package com.xtreak.notificationdictionary
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import java.io.File
+
 
 @Database(entities = [Word::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
@@ -27,13 +29,35 @@ abstract class AppDatabase : RoomDatabase() {
         // same time.
         @Volatile
         private var INSTANCE: AppDatabase? = null
-        private var DATABASE_DIR: String = "dictionary.db"
+        private var DATABASE_NAME: String? = null
 
         fun getDatabase(context: Context): AppDatabase {
 
+            val sharedPref = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE
+            )
+            val default_database_key = context.getString(R.string.default_database)
+            val database_name =
+                sharedPref.getString(default_database_key, "dictionary.db") as String
+
+            // On first instance set the shared preference as DATABASE_NAME.
+            if (DATABASE_NAME == null) {
+                DATABASE_NAME = database_name
+            }
+
+            // On subsequent calls if the share preference has changed then we are holding to older
+            // connection. Close it properly and set it as null to return new database. This makes
+            // sure the instance is singleton as long as the preference is not changed.
+            if (INSTANCE != null && DATABASE_NAME != database_name) {
+                DATABASE_NAME = database_name
+                INSTANCE!!.close()
+                INSTANCE = null
+            }
+
             val package_data_directory =
                 Environment.getDataDirectory().absolutePath + "/data/" + context.packageName
-            val db_path = File("$package_data_directory/databases/dictionary.db")
+            val db_path = File("$package_data_directory/databases/$database_name")
+
 
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
@@ -41,10 +65,10 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context,
                     AppDatabase::class.java,
-                    "dictionary.db"
+                    database_name
                 ).createFromFile(db_path).build()
-                INSTANCE = instance
                 // return instance
+                INSTANCE = instance
                 instance
             }
         }
