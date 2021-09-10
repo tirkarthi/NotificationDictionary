@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/switch_theme"
+        app:actionLayout="@layout/switch_layout"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/about_us"
-        android:showAsAction="always"
-        android:title="@string/about"/>
+        android:showAsAction="never"
+        android:title="@string/about" />
+
     <item
         android:id="@+id/license"
-        android:showAsAction="always"
-        android:title="@string/license"/>
+        android:showAsAction="never"
+        android:title="@string/license" />
 </menu>
