@@ -11,4 +11,12 @@
     </string>
     <string name="license">Licenses</string>
     <string name="process_text_label">Meaning</string>
+    <string name="preference_file_key">notification_dictionary</string>
+    <string name="default_database">default_database</string>
+    <string name="default_word">Hope</string>
+    <string name="selected_language">selected_language</string>
+    <string name="search">Search</string>
+    <string name="manage">Manage</string>
+    <string name="change_confirmation">Do you want to change the language and download database if not present?</string>
+    <string name="confirmation">Language</string>
 </resources>
