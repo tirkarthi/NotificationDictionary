@@ -24,6 +24,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
@@ -56,8 +57,11 @@ class MainActivity : AppCompatActivity() {
         val selected_language_key = getString(R.string.selected_language)
         var default_language_value = "en"
         var default_database_value = "dictionary.db"
+        var selected_theme = "selected_theme"
 
         var selected_language = sharedPref.getString(selected_language_key, "UNSET") as String
+        var theme = sharedPref.getInt(selected_theme, R.style.Theme_NotificationDictionary)
+
 
         // https://stackoverflow.com/questions/4212320/get-the-current-language-in-device
         val current_locale = Locale.getDefault().language
@@ -88,6 +92,12 @@ class MainActivity : AppCompatActivity() {
             Environment.getDataDirectory().absolutePath + "/data/" + packageName
         val file = File("$package_data_directory/databases/$database_name")
 
+        if (theme == R.style.Theme_NotificationDictionary) {
+            setTheme(R.style.Theme_NotificationDictionary)
+        } else {
+            setTheme(R.style.Theme_NotificationDictionary_Dark)
+        }
+
         setContentView(R.layout.activity_main)
         setLocale(selected_language)
         createNotificationChannel()
@@ -101,8 +111,27 @@ class MainActivity : AppCompatActivity() {
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         mRecyclerView.layoutManager = linearLayoutManager
 
+        var mListadapter =
+            RoomAdapter(
+                listOf(
+                    Word(
+                        1,
+                        "",
+                        "Thanks for the support",
+                        1,
+                        1,
+                        """The application is open source and free to use. The development is
+                                done in my free time apart from my day job along with download costs for database files 
+                                from CDN. If you find the app useful please leave a review in Play store and share the 
+                                app with your friends. It will help and encourage me in maintaining the app and adding more features. 
+                                Thanks."""
+                    )
+                ), this
+            )
+        mRecyclerView.adapter = mListadapter
+
         initialize_spinner(database_name)
-        show_changelog()
+        // show_changelog()
         show_rating()
         onNewIntent(intent)
     }
@@ -158,6 +187,7 @@ class MainActivity : AppCompatActivity() {
                         .setTitle(getString(R.string.confirmation))
                         .setMessage(getString(R.string.change_confirmation))
                         .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setCancelable(false)
                         .setPositiveButton(android.R.string.yes,
                             DialogInterface.OnClickListener { dialog, whichButton ->
 
@@ -251,13 +281,47 @@ class MainActivity : AppCompatActivity() {
             .setMinimumLaunchTimesToShowAgain(15)
             .setMinimumDaysToShowAgain(10)
             .setRatingThreshold(RatingThreshold.FIVE)
-            .useGoogleInAppReview()
             .showIfMeetsConditions()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu, menu)
+
+        val menuItem = menu!!.findItem(R.id.switch_theme)
+        val view = MenuItemCompat.getActionView(menuItem)
+        val sharedPref = applicationContext.getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE
+        )
+        val switch = view.findViewById<View>(R.id.theme_switch_button) as Switch
+        switch.isChecked = sharedPref.getInt(
+            "selected_theme",
+            R.style.Theme_NotificationDictionary
+        ) == R.style.Theme_NotificationDictionary_Dark
+
+        // https://stackoverflow.com/questions/32091709/how-to-get-set-action-event-in-android-actionbar-switch
+        // https://stackoverflow.com/questions/8811594/implementing-user-choice-of-theme
+        // https://stackoverflow.com/questions/2482848/how-to-change-current-theme-at-runtime-in-android
+        // recreate needs to be called as per stackoverflow answers after initial theme is set though it's not documented.
+        switch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                with(sharedPref.edit()) {
+                    putInt("selected_theme", R.style.Theme_NotificationDictionary_Dark)
+                    apply()
+                    commit()
+                }
+                setTheme(R.style.Theme_NotificationDictionary_Dark)
+                recreate()
+            } else {
+                with(sharedPref.edit()) {
+                    putInt("selected_theme", R.style.Theme_NotificationDictionary)
+                    apply()
+                    commit()
+                }
+                setTheme(R.style.Theme_NotificationDictionary)
+                recreate()
+            }
+        }
         return true
     }
 
