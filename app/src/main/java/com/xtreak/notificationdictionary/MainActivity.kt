@@ -35,6 +35,7 @@ import com.huxq17.download.core.DownloadListener
 import com.suddenh4x.ratingdialog.AppRating
 import com.suddenh4x.ratingdialog.preferences.RatingThreshold
 import de.cketti.library.changelog.ChangeLog
+import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -414,7 +415,7 @@ class MainActivity : AppCompatActivity() {
                     Snackbar.make(
                         findViewById(R.id.mainLayout),
                         "Download failed. Please check your internet connection and relaunch the app.",
-                        Snackbar.LENGTH_SHORT
+                        Snackbar.LENGTH_INDEFINITE
                     ).show()
                 }
             })
@@ -485,7 +486,21 @@ class MainActivity : AppCompatActivity() {
         executor.execute {
             val database = AppDatabase.getDatabase(this)
             val dao = database.dictionaryDao()
-            val meanings = dao.getAllMeaningsByWord(word)
+            var meanings: List<Word>
+
+            try {
+                meanings = dao.getAllMeaningsByWord(word)
+            } catch (e: Exception) {
+                Sentry.captureException(e);
+                meanings = listOf(
+                    Word(
+                        1, "", "Error", 1, 1,
+                        "There was an error while trying to fetch the meaning. The app tries to download the database at first launch for offline usage." +
+                                "The error usually occurs if the database was not downloaded properly due to network issue during start or changing language." +
+                                "Please turn on your internet connection and restart the app to download the database."
+                    )
+                )
+            }
 
             handler.post {
                 val mRecyclerView = findViewById<RecyclerView>(R.id.meaningRecyclerView)

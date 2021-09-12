@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
+import io.sentry.Sentry
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -39,7 +40,18 @@ class ProcessTextActivity : AppCompatActivity() {
         executor.execute {
             val database = AppDatabase.getDatabase(this)
             val dao = database.dictionaryDao()
-            val meaning = dao.getMeaningsByWord(word, 1)
+            var meaning: Word?
+            try {
+                meaning = dao.getMeaningsByWord(word, 1)
+            } catch (e: Exception) {
+                Sentry.captureException(e);
+                meaning = Word(
+                    1, "", "Error", 1, 1,
+                    "There was an error while trying to fetch the meaning. The app tries to download the database at first launch for offline usage." +
+                            "The error usually occurs if the database was not downloaded properly due to network issue during start or changing language." +
+                            "Please turn on your internet connection and restart the app to download the database."
+                )
+            }
             definition = meaning?.definition ?: "No meaning found"
         }
         executor.shutdown()
