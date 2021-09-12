@@ -163,10 +163,12 @@ class MainActivity : AppCompatActivity() {
 
         // Set spinner selection after setting adapter. https://stackoverflow.com/a/1484546/2610955
         // Pass animated as false so that callback is not triggered. https://stackoverflow.com/a/17336944/2610955
-        if (database_name == "dictionary.db") {
-            spinner.setSelection(0, false)
-        } else {
+        if (database_name == "dictionary_fr.db") {
             spinner.setSelection(1, false)
+        } else if (database_name == "dictionary_de.db") {
+            spinner.setSelection(2, false)
+        } else {
+            spinner.setSelection(0, false)
         }
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
