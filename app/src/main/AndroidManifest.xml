@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NotificationDictionary">
+        <meta-data android:name="io.sentry.dsn" android:value="https://c2152c70152f4dbab75dd18714a65699@o996828.ingest.sentry.io/5955342" />
         <activity
             android:name=".AboutActivity"
             android:exported="true"
