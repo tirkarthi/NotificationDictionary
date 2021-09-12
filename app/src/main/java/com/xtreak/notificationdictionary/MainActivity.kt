@@ -71,10 +71,22 @@ class MainActivity : AppCompatActivity() {
         // better onboarding experience. Example french users on start will have french selected.
         // Current locale might be fr but user might have selected english. In that case check for
         // preference to be UNSET
-        if (current_locale.startsWith("fr", ignoreCase = true) && selected_language == "UNSET") {
-            default_language_value = current_locale
-            default_database_value = "dictionary_fr.db"
-
+        if (selected_language == "UNSET") {
+            if (current_locale.startsWith(
+                    "fr",
+                    ignoreCase = true
+                )
+            ) {
+                default_language_value = current_locale
+                default_database_value = "dictionary_fr.db"
+            } else if (current_locale.startsWith(
+                    "de",
+                    ignoreCase = true
+                )
+            ) {
+                default_language_value = current_locale
+                default_database_value = "dictionary_de.db"
+            }
             // Set values here so that
             with(sharedPref.edit()) {
                 putString(default_database_key, default_database_value)
@@ -139,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initialize_spinner(database_name: String) {
         val spinner = findViewById<View>(R.id.spinner) as Spinner
-        val languages = arrayOf("English", "French")
+        val languages = arrayOf("English", "French", "German")
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             this@MainActivity,
             android.R.layout.simple_spinner_item, languages
@@ -210,6 +222,9 @@ class MainActivity : AppCompatActivity() {
                                     database_name = "dictionary_fr.db"
                                     selected_language = "fr"
                                     setLocale("fr")
+                                } else if (item == "German") {
+                                    database_name = "dictionary_de.db"
+                                    selected_language = "de"
                                 }
 
                                 with(sharedPref.edit()) {
@@ -491,7 +506,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 meanings = dao.getAllMeaningsByWord(word)
             } catch (e: Exception) {
-                Sentry.captureException(e);
+                Sentry.captureException(e)
                 meanings = listOf(
                     Word(
                         1, "", "Error", 1, 1,
