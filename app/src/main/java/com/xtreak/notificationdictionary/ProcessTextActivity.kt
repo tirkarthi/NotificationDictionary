@@ -12,6 +12,7 @@ package com.xtreak.notificationdictionary
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -79,7 +80,16 @@ class ProcessTextActivity : AppCompatActivity() {
         intent.putExtra("NotificationWord", word)
         val stack = TaskStackBuilder.create(context)
         stack.addNextIntentWithParentStack(intent)
-        val pendingIntent = stack.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        // https://github.com/square/leakcanary/pull/2090
+        // https://stackoverflow.com/questions/67045607/how-to-resolve-missing-pendingintent-mutability-flag-lint-warning-in-android-a
+        // https://stackoverflow.com/questions/9223420/passing-multiple-flags-to-an-intent-in-android/9223566
+        val flags = if (Build.VERSION.SDK_INT > 30) {
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_CANCEL_CURRENT
+        }
+        Sentry.captureMessage("Process text event")
+        val pendingIntent = stack.getPendingIntent(0, flags)
 
         builder.setContentIntent(pendingIntent)
         val notificationManager = NotificationManagerCompat.from(context)
