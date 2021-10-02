@@ -1,0 +1,9 @@
+An app to access meaning of selected word as a notification. It works across all apps that support text selection. The apps shows the meaning as a notification for quick reference. Clicking on the notification user can see all the meanings for the given word. The user can also search for meaning of other words.
+
+* Easy access from all apps that have text selection.
+* Enabled for offline usage.
+* Supports English, French and German.
+* Click to copy meaning to clipboard.
+* Long press to share meanings with others.
+* Wide variety of meanings from Wikitionary.
+* Open source and MIT License.
