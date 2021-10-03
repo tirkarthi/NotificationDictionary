@@ -36,6 +36,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.mikepenz.aboutlibraries.ui.LibsActivity"
+            android:theme="@style/Theme.MaterialComponents.NoActionBar" />
     </application>
 
 </manifest>

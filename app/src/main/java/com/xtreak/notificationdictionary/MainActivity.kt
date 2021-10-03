@@ -27,11 +27,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.android.material.snackbar.Snackbar
 import com.huxq17.download.Pump
 import com.huxq17.download.config.DownloadConfig
 import com.huxq17.download.core.DownloadListener
+import com.mikepenz.aboutlibraries.LibsBuilder
 import com.suddenh4x.ratingdialog.AppRating
 import com.suddenh4x.ratingdialog.preferences.RatingThreshold
 import de.cketti.library.changelog.ChangeLog
@@ -350,7 +350,10 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(about_activity, 0)
             }
             R.id.license -> {
-                startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+                LibsBuilder()
+                    .withActivityTitle("Open Source Licenses")
+                    .withLicenseShown(true)
+                    .start(this)
             }
         }
         return true
