@@ -32,10 +32,7 @@ import com.huxq17.download.Pump
 import com.huxq17.download.config.DownloadConfig
 import com.huxq17.download.core.DownloadListener
 import com.mikepenz.aboutlibraries.LibsBuilder
-import com.suddenh4x.ratingdialog.AppRating
-import com.suddenh4x.ratingdialog.preferences.RatingThreshold
 import de.cketti.library.changelog.ChangeLog
-import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -145,7 +142,6 @@ class MainActivity : AppCompatActivity() {
 
         initialize_spinner(database_name)
         // show_changelog()
-        show_rating()
         onNewIntent(intent)
     }
 
@@ -290,16 +286,6 @@ class MainActivity : AppCompatActivity() {
         if (changelog.isFirstRun) {
             changelog.logDialog.show()
         }
-    }
-
-    fun show_rating() {
-        AppRating.Builder(this)
-            .setMinimumLaunchTimes(10)
-            .setMinimumDays(2)
-            .setMinimumLaunchTimesToShowAgain(15)
-            .setMinimumDaysToShowAgain(10)
-            .setRatingThreshold(RatingThreshold.FIVE)
-            .showIfMeetsConditions()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -511,7 +497,6 @@ class MainActivity : AppCompatActivity() {
             try {
                 meanings = dao.getAllMeaningsByWord(word)
             } catch (e: Exception) {
-                Sentry.captureException(e)
                 meanings = listOf(
                     Word(
                         1, "", "Error", 1, 1,

@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import io.sentry.Sentry
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -45,7 +44,6 @@ class ProcessTextActivity : AppCompatActivity() {
             try {
                 meaning = dao.getMeaningsByWord(word, 1)
             } catch (e: Exception) {
-                Sentry.captureException(e);
                 meaning = Word(
                     1, "", "Error", 1, 1,
                     "There was an error while trying to fetch the meaning. The app tries to download the database at first launch for offline usage." +
@@ -88,7 +86,6 @@ class ProcessTextActivity : AppCompatActivity() {
         } else {
             PendingIntent.FLAG_CANCEL_CURRENT
         }
-        Sentry.captureMessage("Process text event")
         val pendingIntent = stack.getPendingIntent(0, flags)
 
         builder.setContentIntent(pendingIntent)
