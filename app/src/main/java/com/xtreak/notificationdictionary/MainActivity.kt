@@ -21,7 +21,9 @@ import android.os.*
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.*
+import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuItemCompat
@@ -113,6 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         setLocale(selected_language)
+        setIMEAction()
         createNotificationChannel()
 
         if (!file.exists()) {
@@ -147,6 +150,17 @@ class MainActivity : AppCompatActivity() {
         // show_changelog()
         show_rating()
         onNewIntent(intent)
+    }
+
+    private fun setIMEAction() {
+        val wordEdit = findViewById<EditText>(R.id.wordInput)
+        wordEdit.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                sendMessage(v)
+                return@OnEditorActionListener true
+            }
+            false
+        })
     }
 
     fun initialize_spinner(database_name: String) {
@@ -279,10 +293,6 @@ class MainActivity : AppCompatActivity() {
         val word: String? = intent?.extras?.getString("NotificationWord")
 
         searchButton.text = getString(R.string.search)
-        // Set it only if it's not from notification
-        if (word == null) {
-            wordEdit.setText(R.string.default_word)
-        }
     }
 
     fun show_changelog() {
@@ -465,7 +475,6 @@ class MainActivity : AppCompatActivity() {
 
                 // Fill the text box with word and emulate click to get all meanings
                 wordEdit.setText(word)
-                wordEdit.isFocusable = false
                 searchButton.performClick()
             }
         }
@@ -495,8 +504,6 @@ class MainActivity : AppCompatActivity() {
 
         // https://stackoverflow.com/questions/18414804/android-edittext-remove-focus-after-clicking-a-button
         wordEdit.clearFocus()
-        wordEdit.isEnabled = false
-        wordEdit.isEnabled = true
 
         val word = wordEdit.text.toString().lowercase()
 
