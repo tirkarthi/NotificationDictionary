@@ -498,7 +498,7 @@ class MainActivity : AppCompatActivity() {
         wordEdit.isEnabled = false
         wordEdit.isEnabled = true
 
-        val word = wordEdit.text.toString().lowercase()
+        val word = wordEdit.text.toString().trim().lowercase()
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
