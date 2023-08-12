@@ -505,7 +505,7 @@ class MainActivity : AppCompatActivity() {
         // https://stackoverflow.com/questions/18414804/android-edittext-remove-focus-after-clicking-a-button
         wordEdit.clearFocus()
 
-        val word = wordEdit.text.toString().lowercase()
+        val word = wordEdit.text.toString().trim().lowercase()
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
