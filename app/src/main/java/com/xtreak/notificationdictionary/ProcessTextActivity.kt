@@ -43,6 +43,9 @@ class ProcessTextActivity : AppCompatActivity() {
             var meaning: Word?
             try {
                 meaning = dao.getMeaningsByWord(word, 1)
+                if (meaning != null) {
+                    resolveRedirectMeaning(listOf(meaning) as List<Word>, dao)
+                }
             } catch (e: Exception) {
                 meaning = Word(
                     1, "", "Error", 1, 1,

@@ -57,10 +57,10 @@ class MainActivity : AppCompatActivity() {
         val selected_language_key = getString(R.string.selected_language)
         var default_language_value = "en"
         var default_database_value = "dictionary.db"
-        var selected_theme = "selected_theme"
+        val selected_theme = "selected_theme"
 
         var selected_language = sharedPref.getString(selected_language_key, "UNSET") as String
-        var theme = sharedPref.getInt(selected_theme, R.style.Theme_NotificationDictionary)
+        val theme = sharedPref.getInt(selected_theme, R.style.Theme_NotificationDictionary)
 
 
         // https://stackoverflow.com/questions/4212320/get-the-current-language-in-device
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         mRecyclerView.layoutManager = linearLayoutManager
 
-        var mListadapter =
+        val mListadapter =
             RoomAdapter(
                 listOf(
                     Word(
@@ -514,6 +514,12 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
+            try {
+                resolveRedirectMeaning(meanings, dao)
+            } catch (e: Exception) {
+                Sentry.captureException(e)
+            }
+
             handler.post {
                 val mRecyclerView = findViewById<RecyclerView>(R.id.meaningRecyclerView)
                 var mListadapter =
@@ -528,4 +534,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
 }
