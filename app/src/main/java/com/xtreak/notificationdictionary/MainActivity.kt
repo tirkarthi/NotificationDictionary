@@ -517,7 +517,6 @@ class MainActivity : AppCompatActivity() {
             try {
                 resolveRedirectMeaning(meanings, dao)
             } catch (e: Exception) {
-                Sentry.captureException(e)
             }
 
             handler.post {
