@@ -27,9 +27,9 @@ android {
     defaultConfig {
         applicationId "com.xtreak.notificationdictionary"
         minSdk 24
-        targetSdk 31
-        versionCode 18
-        versionName "0.0.18"
+        targetSdk 33
+        versionCode 19
+        versionName "0.0.19"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
