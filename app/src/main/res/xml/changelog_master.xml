@@ -10,6 +10,16 @@
   -->
 
 <changelog>
+    <release version="0.0.19" versioncode="19" >
+        <change>Bump target API level as per Google Play requirements.</change>
+    </release>
+    <release version="0.0.18" versioncode="18" >
+        <change>Add support to have meaning inline for words of plurals and different tense.</change>
+        <change>Trim whitespace around text when keyboard autocomplete is used during input.</change>
+        <change>Remove default word</change>
+        <change>Use Return key for search</change>
+        <change>Enable editing the word when entering the app through notification</change>
+    </release>
     <release version="0.0.7" versioncode="7" >
         <change>Fixed crash on long press to share in some devices.</change>
     </release>
