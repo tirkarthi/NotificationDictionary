@@ -31,8 +31,13 @@ class ProcessTextActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val word: String
         val context = applicationContext
-        val word = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString().lowercase()
+        if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+            word = intent.getCharSequenceExtra(Intent.EXTRA_TEXT).toString().lowercase()
+        } else {
+            word = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString().lowercase()
+        }
 
         val executor = Executors.newSingleThreadExecutor()
         var definition = "No meaning found"
