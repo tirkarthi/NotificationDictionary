@@ -10,6 +10,7 @@
 
 package com.xtreak.notificationdictionary
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.ProgressDialog
@@ -24,8 +25,10 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.widget.TextView.OnEditorActionListener
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,6 +52,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var progress_dialog: ProgressDialog
     private val CHANNEL_ID = "Dictionary"
+    private val NOTIFICATION_REQUEST_CODE = 11
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,7 +145,11 @@ class MainActivity : AppCompatActivity() {
                                 done in my free time apart from my day job along with download costs for database files 
                                 from CDN. If you find the app useful please leave a review in Play store and share the 
                                 app with your friends. It will help and encourage me in maintaining the app and adding more features. 
-                                Thanks."""
+
+                                Please grant notification permission since the app requires notification permission in
+                                Android 13+ to show meanings through notification.
+                                Thanks for your support.
+                                """
                     )
                 ), this
             )
@@ -150,6 +159,10 @@ class MainActivity : AppCompatActivity() {
         // show_changelog()
         show_rating()
         onNewIntent(intent)
+
+        // Request notification permission in Android 33+
+        // https://developer.android.com/develop/ui/views/notifications/notification-permission
+        requestNotificationPermission()
     }
 
     private fun setIMEAction() {
@@ -496,6 +509,19 @@ class MainActivity : AppCompatActivity() {
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= 33 && !notificationManager.areNotificationsEnabled()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                NOTIFICATION_REQUEST_CODE
+            )
         }
     }
 
