@@ -25,7 +25,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.widget.TextView.OnEditorActionListener
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -329,39 +328,35 @@ class MainActivity : AppCompatActivity() {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu, menu)
 
-        val menuItem = menu!!.findItem(R.id.switch_theme)
-        val view = MenuItemCompat.getActionView(menuItem)
+        val switchSoundItem = menu!!.findItem(R.id.switch_sound)
+        val soundView = MenuItemCompat.getActionView(switchSoundItem)
         val sharedPref = applicationContext.getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE
         )
-        val switch = view.findViewById<View>(R.id.theme_switch_button) as Switch
-        switch.isChecked = sharedPref.getInt(
-            "selected_theme",
-            R.style.Theme_NotificationDictionary
-        ) == R.style.Theme_NotificationDictionary_Dark
+
+        val switch_sound = soundView.findViewById<View>(R.id.sound_switch_button) as Switch
+        var switch_sound_value = sharedPref.getBoolean(
+            "read_definition",
+            false
+        )
+
+        switch_sound.isChecked = switch_sound_value
+
 
         // https://stackoverflow.com/questions/32091709/how-to-get-set-action-event-in-android-actionbar-switch
         // https://stackoverflow.com/questions/8811594/implementing-user-choice-of-theme
         // https://stackoverflow.com/questions/2482848/how-to-change-current-theme-at-runtime-in-android
         // recreate needs to be called as per stackoverflow answers after initial theme is set though it's not documented.
-        switch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                with(sharedPref.edit()) {
-                    putInt("selected_theme", R.style.Theme_NotificationDictionary_Dark)
-                    apply()
-                    commit()
-                }
-                setTheme(R.style.Theme_NotificationDictionary_Dark)
-                recreate()
-            } else {
-                with(sharedPref.edit()) {
-                    putInt("selected_theme", R.style.Theme_NotificationDictionary)
-                    apply()
-                    commit()
-                }
-                setTheme(R.style.Theme_NotificationDictionary)
-                recreate()
+        switch_sound.setOnClickListener { buttonView ->
+            val sound_button = findViewById<View>(R.id.sound_switch_button) as Switch
+            switch_sound_value = !switch_sound_value
+            with(sharedPref.edit()) {
+                putBoolean("read_definition", switch_sound_value)
+                apply()
+                commit()
             }
+
+            sound_button.isChecked = switch_sound_value
         }
         return true
     }
