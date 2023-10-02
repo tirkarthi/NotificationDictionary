@@ -11,22 +11,43 @@
 package com.xtreak.notificationdictionary
 
 import android.app.PendingIntent
-import android.content.Intent
+import android.content.*
 import android.os.Build
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import io.sentry.Sentry
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 
-class ProcessTextActivity : AppCompatActivity() {
+private class TTSOnInitListener(
+    private val in_word: String,
+    private val in_definition: String,
+    private val context: Context
+) : TextToSpeech.OnInitListener {
+    val tts = TextToSpeech(context, this)
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            tts.language = Locale.getDefault()
+            Log.d("ndict current locale", Locale.getDefault().language)
+            tts.speak("$in_word, $in_definition", TextToSpeech.QUEUE_FLUSH, null)
+        }
+    }
+}
+
+open class ProcessIntentActivity : AppCompatActivity() {
 
     private val CHANNEL_ID = "Dictionary"
     private val CHANNEL_NUMBER = 1
+    private val NOTIFICATION_TIMEOUT = 20000
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +66,7 @@ class ProcessTextActivity : AppCompatActivity() {
             try {
                 meaning = dao.getMeaningsByWord(word, 1)
                 if (meaning != null) {
-                    resolveRedirectMeaning(listOf(meaning) as List<Word>, dao)
+                    resolveRedirectMeaning(listOf(meaning), dao)
                 }
             } catch (e: Exception) {
                 Sentry.captureException(e)
@@ -73,7 +94,13 @@ class ProcessTextActivity : AppCompatActivity() {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setSound(null) // sound is set null but still the notification importance level seems to trigger sound
             .setAutoCancel(true)
-            .setTimeoutAfter(20000)
+            .setTimeoutAfter(NOTIFICATION_TIMEOUT.toLong())
+
+        if (definition != "No meaning found") {
+            addCopyButton(word, definition, context, builder)
+            addShareButton(word, definition, context, builder)
+            addReadButton(word, definition, context, builder)
+        }
 
         val intent = Intent(
             context, MainActivity::class.java
@@ -91,15 +118,157 @@ class ProcessTextActivity : AppCompatActivity() {
         } else {
             PendingIntent.FLAG_CANCEL_CURRENT
         }
-        Sentry.captureMessage("Process text event")
         val pendingIntent = stack.getPendingIntent(0, flags)
 
         builder.setContentIntent(pendingIntent)
         val notificationManager = NotificationManagerCompat.from(context)
         notificationManager.notify(CHANNEL_NUMBER, builder.build())
 
+        val sharedPref = applicationContext.getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE
+        )
+        val read_definition = sharedPref.getBoolean(
+            "read_definition",
+            false
+        )
+
+        Sentry.captureMessage("Process text event. Read definition : $read_definition")
+        if (read_definition) {
+            TTSOnInitListener(word, definition, context)
+        }
         // Android intent filters should have an activity but we need to raise only a notification, so call finish
         // When the app is not open in background or actively running the white screen appears for a second or so.
         this.finish()
     }
+
+    private fun addCopyButton(
+        word: String,
+        definition: String,
+        context: Context,
+        builder: NotificationCompat.Builder
+    ) {
+        // Ref : https://stackoverflow.com/questions/14291436/copy-to-clipboard-by-notification-action
+        val notificationCopy: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent?) {
+                val clipboard: ClipboardManager =
+                    context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("label", "${word} - ${definition}")
+                clipboard.setPrimaryClip(clip)
+
+                // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
+                try {
+                    context.unregisterReceiver(this)
+                } catch (e: IllegalArgumentException) {
+                    Sentry.captureException(e)
+                    Log.e("Notification Dictionary", "Error in unregistering the receiver")
+                }
+            }
+        }
+
+        val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_COPY")
+        context.registerReceiver(notificationCopy, intentFilter)
+
+        val copy = Intent("com.xtreak.notificationdictionary.ACTION_COPY")
+        val nCopy =
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                copy,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        builder.addAction(NotificationCompat.Action(null, "Copy", nCopy))
+    }
+
+    private fun addShareButton(
+        word: String,
+        definition: String,
+        context: Context,
+        builder: NotificationCompat.Builder
+    ) {
+        // Ref : https://stackoverflow.com/questions/14291436/copy-to-clipboard-by-notification-action
+        val notificationShare: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent?) {
+                val sharingIntent = Intent(Intent.ACTION_SEND)
+                sharingIntent.type = "text/plain"
+                val content =
+                    "${word}\n\n${definition}\n\nSent via Notification Dictionary (https://play.google.com/store/apps/details?id=com.xtreak.notificationdictionary)"
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, word)
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, content)
+                startActivity(Intent.createChooser(sharingIntent, "Share via"))
+
+                // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
+                try {
+                    context.unregisterReceiver(this)
+                } catch (e: IllegalArgumentException) {
+                    Sentry.captureException(e)
+                    Log.e("Notification Dictionary", "Error in unregistering the receiver")
+                }
+            }
+        }
+
+        val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_SHARE")
+        context.registerReceiver(notificationShare, intentFilter)
+
+        val share = Intent("com.xtreak.notificationdictionary.ACTION_SHARE")
+        val nShare =
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                share,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        builder.addAction(
+            NotificationCompat.Action(
+                android.R.drawable.ic_menu_share,
+                "Share",
+                nShare
+            )
+        )
+    }
+
+    private fun addReadButton(
+        word: String,
+        definition: String,
+        context: Context,
+        builder: NotificationCompat.Builder,
+    ) {
+        // Ref : https://stackoverflow.com/questions/14291436/copy-to-clipboard-by-notification-action
+        val notificationRead: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent?) {
+                TTSOnInitListener(word, definition, context)
+
+                // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
+                try {
+                    context.unregisterReceiver(this)
+                } catch (e: IllegalArgumentException) {
+                    Sentry.captureException(e)
+                    Log.e("Notification Dictionary", "Error in unregistering the receiver")
+                }
+            }
+        }
+
+        val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_TTS")
+        context.registerReceiver(notificationRead, intentFilter)
+
+        val read = Intent("com.xtreak.notificationdictionary.ACTION_TTS")
+        val nRead =
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                read,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        builder.addAction(NotificationCompat.Action(null, "Read", nRead))
+    }
+
 }
+
+
+// Android needs different classes for different intent filters. So add one PROCESS_TEXT and another for VIEW
+
+class ProcessViewActivity : ProcessIntentActivity()
+
+class ProcessTextActivity : ProcessIntentActivity()
