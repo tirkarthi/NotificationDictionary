@@ -137,19 +137,35 @@ class MainActivity : AppCompatActivity() {
                     Word(
                         1,
                         "",
+                        "Read meanings aloud as you read",
+                        1,
+                        1,
+                        """Enable Read switch at the right top to read aloud meaning of the word when the notification is created. There is also read button per notification to read meaning for each word."""
+                    ),
+                    Word(
+                        1,
+                        "",
+                        "Copy and share",
+                        1,
+                        1,
+                        """Click on meaning to copy. Long press to share meaning with others. Notifications also have button for these actions."""
+                    ),
+                    Word(
+                        1,
+                        "",
                         "Thanks for the support",
                         1,
                         1,
                         """The application is open source and free to use. The development is
-                                done in my free time apart from my day job along with download costs for database files 
-                                from CDN. If you find the app useful please leave a review in Play store and share the 
-                                app with your friends. It will help and encourage me in maintaining the app and adding more features. 
+                                done in my free time apart from my day job along with download costs for database files
+                                from CDN. If you find the app useful please leave a review in Play store and share the
+                                app with your friends. It will help and encourage me in maintaining the app and adding more features.
 
                                 Please grant notification permission since the app requires notification permission in
                                 Android 13+ to show meanings through notification.
                                 Thanks for your support.
                                 """
-                    )
+                    ),
                 ), this
             )
         mRecyclerView.adapter = mListadapter

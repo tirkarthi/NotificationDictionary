@@ -94,7 +94,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setSound(null) // sound is set null but still the notification importance level seems to trigger sound
             .setAutoCancel(true)
-            .setTimeoutAfter(NOTIFICATION_TIMEOUT)
+            .setTimeoutAfter(NOTIFICATION_TIMEOUT.toLong())
 
         if (definition != "No meaning found") {
             addCopyButton(word, definition, context, builder)
@@ -118,7 +118,6 @@ open class ProcessIntentActivity : AppCompatActivity() {
         } else {
             PendingIntent.FLAG_CANCEL_CURRENT
         }
-        Sentry.captureMessage("Process text event")
         val pendingIntent = stack.getPendingIntent(0, flags)
 
         builder.setContentIntent(pendingIntent)
@@ -133,6 +132,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
             false
         )
 
+        Sentry.captureMessage("Process text event. Read definition : $read_definition")
         if (read_definition) {
             TTSOnInitListener(word, definition, context)
         }
