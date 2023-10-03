@@ -160,6 +160,14 @@ class MainActivity : AppCompatActivity() {
                     Word(
                         1,
                         "",
+                        "Multilingual support",
+                        1,
+                        1,
+                        """Languages supported include French, German and Polish."""
+                    ),
+                    Word(
+                        1,
+                        "",
                         "Thanks for the support",
                         1,
                         1,
