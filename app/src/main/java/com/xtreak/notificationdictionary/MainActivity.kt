@@ -89,6 +89,13 @@ class MainActivity : AppCompatActivity() {
             ) {
                 default_language_value = current_locale
                 default_database_value = "dictionary_de.db"
+            } else if (current_locale.startsWith(
+                    "pl",
+                    ignoreCase = true
+                )
+            ) {
+                default_language_value = current_locale
+                default_database_value = "dictionary_pl.db"
             }
             // Set values here so that
             with(sharedPref.edit()) {
@@ -189,7 +196,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initialize_spinner(database_name: String) {
         val spinner = findViewById<View>(R.id.spinner) as Spinner
-        val languages = arrayOf("English", "French", "German")
+        val languages = arrayOf("English", "French", "German", "Polish")
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             this@MainActivity,
             android.R.layout.simple_spinner_item, languages
@@ -205,6 +212,8 @@ class MainActivity : AppCompatActivity() {
             spinner.setSelection(1, false)
         } else if (database_name == "dictionary_de.db") {
             spinner.setSelection(2, false)
+        } else if (database_name == "dictionary_pl.db") {
+            spinner.setSelection(3, false)
         } else {
             spinner.setSelection(0, false)
         }
@@ -265,6 +274,9 @@ class MainActivity : AppCompatActivity() {
                                 } else if (item == "German") {
                                     database_name = "dictionary_de.db"
                                     selected_language = "de"
+                                } else if (item == "Polish") {
+                                    database_name = "dictionary_pl.db"
+                                    selected_language = "pl"
                                 }
 
                                 with(sharedPref.edit()) {
