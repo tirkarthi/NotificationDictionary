@@ -38,6 +38,7 @@ private class TTSOnInitListener(
             tts.language = Locale.getDefault()
             Log.d("ndict current locale", Locale.getDefault().language)
             tts.speak("$in_word, $in_definition", TextToSpeech.QUEUE_FLUSH, null)
+            Sentry.captureMessage("Process read event.")
         }
     }
 }
@@ -132,7 +133,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
             false
         )
 
-        Sentry.captureMessage("Process text event. Read definition : $read_definition")
+        Sentry.captureMessage("Process text event.")
         if (read_definition) {
             TTSOnInitListener(word, definition, context)
         }
