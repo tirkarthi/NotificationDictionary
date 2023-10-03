@@ -133,7 +133,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
             false
         )
 
-        Sentry.captureMessage("Process text event.")
+        Sentry.captureMessage("Process text event")
         if (read_definition) {
             TTSOnInitListener(word, definition, context)
         }
