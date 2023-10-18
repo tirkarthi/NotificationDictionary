@@ -22,14 +22,14 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.xtreak.notificationdictionary"
         minSdk 24
-        targetSdk 31
-        versionCode 15
-        versionName "0.0.15"
+        targetSdk 33
+        versionCode 22
+        versionName "0.0.22"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -18,9 +18,9 @@
         android:focusableInTouchMode="true"
         android:hint="@string/word"
         android:inputType="textPersonName"
-        android:text="@string/default_word"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:imeOptions="actionSearch" />
 
     <Button
         android:id="@+id/searchButton"
