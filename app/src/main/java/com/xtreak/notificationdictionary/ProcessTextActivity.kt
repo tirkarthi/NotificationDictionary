@@ -65,7 +65,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
             val dao = database.dictionaryDao()
             var meaning: Word?
             try {
-                meaning = dao.getMeaningsByWord(word, 1)
+                meaning = dao.getVocabularyMeaningsByWord(word, 1)
                 if (meaning != null) {
                     resolveRedirectMeaning(listOf(meaning), dao)
                 }

@@ -18,6 +18,9 @@ interface DictionaryDao {
     @Query("SELECT * FROM dictionary WHERE word = :word COLLATE NOCASE LIMIT :limit")
     fun getMeaningsByWord(word: String, limit: Int): Word?
 
+    @Query("SELECT * FROM dictionary WHERE word = :word AND lexical_category != 'Proper noun' COLLATE NOCASE LIMIT :limit")
+    fun getVocabularyMeaningsByWord(word: String, limit: Int): Word?
+
     @Query("SELECT * FROM dictionary WHERE word = :word COLLATE NOCASE")
     fun getAllMeaningsByWord(word: String): List<Word>
 }
