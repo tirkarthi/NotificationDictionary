@@ -12,15 +12,15 @@ package com.xtreak.notificationdictionary
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 
 @Dao
 interface DictionaryDao {
-    @Query("SELECT * FROM dictionary WHERE word = :word COLLATE NOCASE LIMIT :limit")
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT CASE WHEN lexical_category LIKE 'Proper noun' THEN 2 ELSE 1 END AS priority, * FROM dictionary WHERE word = :word COLLATE NOCASE ORDER BY priority LIMIT :limit")
     fun getMeaningsByWord(word: String, limit: Int): Word?
 
-    @Query("SELECT * FROM dictionary WHERE word = :word AND lexical_category != 'Proper noun' COLLATE NOCASE LIMIT :limit")
-    fun getVocabularyMeaningsByWord(word: String, limit: Int): Word?
-
-    @Query("SELECT * FROM dictionary WHERE word = :word COLLATE NOCASE")
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT CASE WHEN lexical_category LIKE 'Proper noun' THEN 2 ELSE 1 END AS priority, * FROM dictionary WHERE word = :word COLLATE NOCASE ORDER BY priority")
     fun getAllMeaningsByWord(word: String): List<Word>
 }
