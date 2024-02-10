@@ -10,6 +10,7 @@
 
 package com.xtreak.notificationdictionary
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.ProgressDialog
@@ -26,6 +27,7 @@ import android.widget.*
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var progress_dialog: ProgressDialog
     private val CHANNEL_ID = "Dictionary"
+    private val NOTIFICATION_REQUEST_CODE = 11
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +92,13 @@ class MainActivity : AppCompatActivity() {
             ) {
                 default_language_value = current_locale
                 default_database_value = "dictionary_de.db"
+            } else if (current_locale.startsWith(
+                    "pl",
+                    ignoreCase = true
+                )
+            ) {
+                default_language_value = current_locale
+                default_database_value = "dictionary_pl.db"
             }
             // Set values here so that
             with(sharedPref.edit()) {
@@ -133,15 +144,43 @@ class MainActivity : AppCompatActivity() {
                     Word(
                         1,
                         "",
+                        "Read meanings aloud as you read",
+                        1,
+                        1,
+                        """Enable Read switch at the right top to read aloud meaning of the word when the notification is created. There is also read button per notification to read meaning for each word."""
+                    ),
+                    Word(
+                        1,
+                        "",
+                        "Copy and share",
+                        1,
+                        1,
+                        """Click on meaning to copy. Long press to share meaning with others. Notifications also have button for these actions."""
+                    ),
+                    Word(
+                        1,
+                        "",
+                        "Multilingual support",
+                        1,
+                        1,
+                        """Languages supported include French, German and Polish."""
+                    ),
+                    Word(
+                        1,
+                        "",
                         "Thanks for the support",
                         1,
                         1,
                         """The application is open source and free to use. The development is
-                                done in my free time apart from my day job along with download costs for database files 
-                                from CDN. If you find the app useful please leave a review in Play store and share the 
-                                app with your friends. It will help and encourage me in maintaining the app and adding more features. 
-                                Thanks."""
-                    )
+                                done in my free time apart from my day job along with download costs for database files
+                                from CDN. If you find the app useful please leave a review in Play store and share the
+                                app with your friends. It will help and encourage me in maintaining the app and adding more features.
+
+                                Please grant notification permission since the app requires notification permission in
+                                Android 13+ to show meanings through notification.
+                                Thanks for your support.
+                                """
+                    ),
                 ), this
             )
         mRecyclerView.adapter = mListadapter
@@ -150,6 +189,10 @@ class MainActivity : AppCompatActivity() {
         // show_changelog()
         show_rating()
         onNewIntent(intent)
+
+        // Request notification permission in Android 33+
+        // https://developer.android.com/develop/ui/views/notifications/notification-permission
+        requestNotificationPermission()
     }
 
     private fun setIMEAction() {
@@ -165,7 +208,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initialize_spinner(database_name: String) {
         val spinner = findViewById<View>(R.id.spinner) as Spinner
-        val languages = arrayOf("English", "French", "German")
+        val languages = arrayOf("English", "French", "German", "Polish")
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             this@MainActivity,
             android.R.layout.simple_spinner_item, languages
@@ -181,6 +224,8 @@ class MainActivity : AppCompatActivity() {
             spinner.setSelection(1, false)
         } else if (database_name == "dictionary_de.db") {
             spinner.setSelection(2, false)
+        } else if (database_name == "dictionary_pl.db") {
+            spinner.setSelection(3, false)
         } else {
             spinner.setSelection(0, false)
         }
@@ -241,6 +286,9 @@ class MainActivity : AppCompatActivity() {
                                 } else if (item == "German") {
                                     database_name = "dictionary_de.db"
                                     selected_language = "de"
+                                } else if (item == "Polish") {
+                                    database_name = "dictionary_pl.db"
+                                    selected_language = "pl"
                                 }
 
                                 with(sharedPref.edit()) {
@@ -316,39 +364,35 @@ class MainActivity : AppCompatActivity() {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu, menu)
 
-        val menuItem = menu!!.findItem(R.id.switch_theme)
-        val view = MenuItemCompat.getActionView(menuItem)
+        val switchSoundItem = menu!!.findItem(R.id.switch_sound)
+        val soundView = MenuItemCompat.getActionView(switchSoundItem)
         val sharedPref = applicationContext.getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE
         )
-        val switch = view.findViewById<View>(R.id.theme_switch_button) as Switch
-        switch.isChecked = sharedPref.getInt(
-            "selected_theme",
-            R.style.Theme_NotificationDictionary
-        ) == R.style.Theme_NotificationDictionary_Dark
+
+        val switch_sound = soundView.findViewById<View>(R.id.sound_switch_button) as Switch
+        var switch_sound_value = sharedPref.getBoolean(
+            "read_definition",
+            false
+        )
+
+        switch_sound.isChecked = switch_sound_value
+
 
         // https://stackoverflow.com/questions/32091709/how-to-get-set-action-event-in-android-actionbar-switch
         // https://stackoverflow.com/questions/8811594/implementing-user-choice-of-theme
         // https://stackoverflow.com/questions/2482848/how-to-change-current-theme-at-runtime-in-android
         // recreate needs to be called as per stackoverflow answers after initial theme is set though it's not documented.
-        switch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                with(sharedPref.edit()) {
-                    putInt("selected_theme", R.style.Theme_NotificationDictionary_Dark)
-                    apply()
-                    commit()
-                }
-                setTheme(R.style.Theme_NotificationDictionary_Dark)
-                recreate()
-            } else {
-                with(sharedPref.edit()) {
-                    putInt("selected_theme", R.style.Theme_NotificationDictionary)
-                    apply()
-                    commit()
-                }
-                setTheme(R.style.Theme_NotificationDictionary)
-                recreate()
+        switch_sound.setOnClickListener { buttonView ->
+            val sound_button = findViewById<View>(R.id.sound_switch_button) as Switch
+            switch_sound_value = !switch_sound_value
+            with(sharedPref.edit()) {
+                putBoolean("read_definition", switch_sound_value)
+                apply()
+                commit()
             }
+
+            sound_button.isChecked = switch_sound_value
         }
         return true
     }
@@ -496,6 +540,19 @@ class MainActivity : AppCompatActivity() {
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= 33 && !notificationManager.areNotificationsEnabled()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                NOTIFICATION_REQUEST_CODE
+            )
         }
     }
 
