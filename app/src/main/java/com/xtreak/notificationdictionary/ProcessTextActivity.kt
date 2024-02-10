@@ -144,6 +144,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
         }
         // Android intent filters should have an activity but we need to raise only a notification, so call finish
         // When the app is not open in background or actively running the white screen appears for a second or so.
+        // Fixed according to https://stackoverflow.com/questions/24845408/theme-nodisplay-creates-strage-delay
         this.finish()
     }
 
