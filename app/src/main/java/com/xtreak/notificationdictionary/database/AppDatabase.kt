@@ -16,12 +16,15 @@ import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import java.io.File
 
 
-@Database(entities = [Word::class], version = 1, exportSchema = false)
+@Database(entities = [Word::class, History::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
+    abstract fun historyDao(): HistoryDao
 
 
     companion object {
@@ -30,6 +33,14 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
         private var DATABASE_NAME: String? = null
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                Log.d("ndict:", "Migration started")
+                database.execSQL("CREATE TABLE IF NOT EXISTS history(id INTEGER primary key, word TEXT, is_favourite INTEGER default 0 NOT NULL, last_accessed_at INTEGER)")
+                Log.d("ndict:", "Migration completed")
+            }
+        }
 
         fun getDatabase(context: Context): AppDatabase {
 
@@ -66,7 +77,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context,
                     AppDatabase::class.java,
                     database_name
-                ).createFromFile(db_path).build()
+                ).createFromFile(db_path).addMigrations(MIGRATION_1_2).build()
                 // return instance
                 INSTANCE = instance
                 instance

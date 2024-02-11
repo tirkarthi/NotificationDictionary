@@ -54,25 +54,30 @@ open class ProcessIntentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val word: String
+        var lexicalCategory: String = ""
         val context = applicationContext
+        val executor = Executors.newSingleThreadExecutor()
+        var definition = "No meaning found"
+
         if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
             word = intent.getCharSequenceExtra(Intent.EXTRA_TEXT).toString().lowercase()
         } else {
             word = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString().lowercase()
         }
 
-        val executor = Executors.newSingleThreadExecutor()
-        var definition = "No meaning found"
 
         // https://stackoverflow.com/questions/1250643/how-to-wait-for-all-threads-to-finish-using-executorservice
         executor.execute {
             val database = AppDatabase.getDatabase(this)
             val dao = database.dictionaryDao()
+            val historyDao = database.historyDao()
+
             var meaning: Word?
             try {
                 meaning = dao.getMeaningsByWord(word, 1)
                 if (meaning != null) {
                     resolveRedirectMeaning(listOf(meaning), dao)
+                    addHistoryEntry(historyDao, word)
                 }
             } catch (e: Exception) {
                 Sentry.captureException(e)
@@ -83,7 +88,13 @@ open class ProcessIntentActivity : AppCompatActivity() {
                             "Please turn on your internet connection and restart the app to download the database."
                 )
             }
-            definition = meaning?.definition ?: "No meaning found"
+            lexicalCategory = meaning?.lexicalCategory ?: ""
+
+            if (meaning?.definition != null) {
+                definition = "${lexicalCategory}, ${meaning?.definition}"
+            } else {
+                definition = "No meaning found"
+            }
         }
         executor.shutdown()
         executor.awaitTermination(10, TimeUnit.SECONDS)
@@ -106,6 +117,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
             addCopyButton(word, definition, context, builder)
             addShareButton(word, definition, context, builder)
             addReadButton(word, definition, context, builder)
+            addFavouriteButton(word, context, builder)
         }
 
         val intent = Intent(
@@ -192,7 +204,6 @@ open class ProcessIntentActivity : AppCompatActivity() {
         context: Context,
         builder: NotificationCompat.Builder
     ) {
-        // Ref : https://stackoverflow.com/questions/14291436/copy-to-clipboard-by-notification-action
         val notificationShare: BroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent?) {
                 val sharingIntent = Intent(Intent.ACTION_SEND)
@@ -240,7 +251,6 @@ open class ProcessIntentActivity : AppCompatActivity() {
         context: Context,
         builder: NotificationCompat.Builder,
     ) {
-        // Ref : https://stackoverflow.com/questions/14291436/copy-to-clipboard-by-notification-action
         val notificationRead: BroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent?) {
                 TTSOnInitListener(word, definition, context)
@@ -267,8 +277,52 @@ open class ProcessIntentActivity : AppCompatActivity() {
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-        builder.addAction(NotificationCompat.Action(null, "Read", nRead))
+        // builder.addAction(NotificationCompat.Action(null, "Read", nRead))
     }
+
+    private fun addFavouriteButton(
+        word: String,
+        context: Context,
+        builder: NotificationCompat.Builder
+    ) {
+        val database = AppDatabase.getDatabase(this)
+
+        val notificationFavourite: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent?) {
+                val executor = Executors.newSingleThreadExecutor()
+
+                // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
+                try {
+                    executor.execute {
+                        val historyDao = database.historyDao()
+                        historyDao.addFavourite(word)
+                    }
+                    context.unregisterReceiver(this)
+                } catch (e: Exception) {
+                    Sentry.captureException(e)
+                    Log.e("ndict", e.toString())
+                    Log.e("Notification Dictionary", "Error in unregistering the receiver")
+                } finally {
+                    executor.shutdown()
+                }
+            }
+        }
+
+        val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_FAVOURITE")
+        context.registerReceiver(notificationFavourite, intentFilter)
+
+        val star = Intent("com.xtreak.notificationdictionary.ACTION_FAVOURITE")
+        val nStar =
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                star,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        builder.addAction(NotificationCompat.Action(null, "Star", nStar))
+    }
+
 
 }
 

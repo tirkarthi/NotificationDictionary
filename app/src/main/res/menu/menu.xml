@@ -16,4 +16,13 @@
         android:id="@+id/license"
         android:showAsAction="never"
         android:title="@string/license" />
+
+    <item
+        android:id="@+id/history"
+        android:showAsAction="never"
+        android:title="@string/history" />
+    <item
+        android:id="@+id/favourite"
+        android:showAsAction="never"
+        android:title="Favourites" />
 </menu>

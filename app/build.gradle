@@ -48,6 +48,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -68,7 +71,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    def room_version = "2.3.0"
+    def room_version = "2.5.0"
     apply plugin: 'kotlin-kapt'
 
     implementation "androidx.room:room-runtime:$room_version"

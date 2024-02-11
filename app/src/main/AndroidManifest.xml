@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xtreak.notificationdictionary" >
+    package="com.xtreak.notificationdictionary">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NotificationDictionary" >
+        android:theme="@style/Theme.NotificationDictionary">
 
         <meta-data
             android:name="io.sentry.dsn"
@@ -22,42 +22,58 @@
             android:exported="true"
             android:label="@string/about"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="true"
+            android:label="@string/history"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".FavouriteActivity"
+            android:exported="true"
+            android:label="@string/favourite"
+            android:parentActivityName=".MainActivity"/>
 
         <activity
             android:name=".ProcessTextActivity"
             android:exported="true"
             android:label="@string/process_text_label"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ProcessViewActivity"
             android:exported="true"
             android:label="@string/process_text_label"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="http" />
                 <data android:scheme="https" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
