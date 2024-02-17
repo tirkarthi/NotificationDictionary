@@ -30,3 +30,13 @@ data class Word(
     @ColumnInfo(name = "definition_no") val definitionNumber: Int?,
     @ColumnInfo(name = "definition") var definition: String?
 )
+
+@Entity(
+    tableName = "history",
+)
+data class History(
+    @PrimaryKey val id: Int?,
+    @ColumnInfo(name = "word") val word: String?,
+    @ColumnInfo(name = "is_favourite") var isFavourite: Int = 0,
+    @ColumnInfo(name = "last_accessed_at") val lastAccessedAt: Long?
+    )

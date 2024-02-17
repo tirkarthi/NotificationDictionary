@@ -10,6 +10,9 @@
 
 package com.xtreak.notificationdictionary
 
+import android.util.Log
+import io.sentry.Sentry
+import java.lang.Exception
 import java.util.*
 
 /**
@@ -35,4 +38,33 @@ fun resolveRedirectMeaning(
             }
         }
     }
+}
+
+fun addHistoryEntry(
+    historyDao: HistoryDao,
+    word: String
+) {
+
+    val historyEntry = historyDao.getHistory(word)
+
+    try {
+        if (historyEntry != null) {
+            historyDao.updateHistory(
+                word = word,
+                lastAccessedAt = System.currentTimeMillis()
+            )
+        } else {
+            historyDao.insertHistory(
+                History(
+                    id = null,
+                    word = word,
+                    isFavourite = 0,
+                    lastAccessedAt = System.currentTimeMillis()
+                )
+            )
+        }
+    } catch (e: Exception) {
+        Sentry.captureException(e)
+    }
+
 }

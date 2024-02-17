@@ -19,6 +19,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.*
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -144,6 +145,14 @@ class MainActivity : AppCompatActivity() {
                     Word(
                         1,
                         "",
+                        "Store history and favourite words",
+                        1,
+                        1,
+                        """History of searches is stored. Words can also be starred from notification to be stored as favourite. History and Favourite are accessible from the menu at right top. In case of issues due to update please uninstall and try reinstalling the app since it needs database changes."""
+                    ),
+                    Word(
+                        1,
+                        "",
                         "Read meanings aloud as you read",
                         1,
                         1,
@@ -156,14 +165,6 @@ class MainActivity : AppCompatActivity() {
                         1,
                         1,
                         """Click on meaning to copy. Long press to share meaning with others. Notifications also have button for these actions."""
-                    ),
-                    Word(
-                        1,
-                        "",
-                        "Multilingual support",
-                        1,
-                        1,
-                        """Languages supported include French, German and Polish."""
                     ),
                     Word(
                         1,
@@ -409,6 +410,14 @@ class MainActivity : AppCompatActivity() {
                     .withLicenseShown(true)
                     .start(this)
             }
+            R.id.history -> {
+                val history_activity = Intent(applicationContext, HistoryActivity::class.java)
+                startActivityForResult(history_activity, 0)
+            }
+            R.id.favourite -> {
+                val favourite_activity = Intent(applicationContext, FavouriteActivity::class.java)
+                startActivityForResult(favourite_activity, 0)
+            }
         }
         return true
     }
@@ -429,7 +438,7 @@ class MainActivity : AppCompatActivity() {
         // But we don't want the user to cancel this. It's one time and takes a couple of seconds
 
         // TODO: Make this configurable based on environment?
-        val url = "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/$database_name.zip"
+        val url = "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/v2/$database_name.zip"
         // val url = "http://192.168.0.105:8000/$database_name.zip" // for local mobile testing
         // val url = "http://10.0.2.2:8000/$database_name.zip" // for local emulator testing
 
@@ -570,12 +579,17 @@ class MainActivity : AppCompatActivity() {
         executor.execute {
             val database = AppDatabase.getDatabase(this)
             val dao = database.dictionaryDao()
+            val historyDao = database.historyDao()
             var meanings: List<Word>
 
             try {
                 meanings = dao.getAllMeaningsByWord(word)
+                if (meanings.isNotEmpty()) {
+                    addHistoryEntry(historyDao, word)
+                }
             } catch (e: Exception) {
                 Sentry.captureException(e)
+                Log.d("ndict:", e.toString())
                 meanings = listOf(
                     Word(
                         1, "", "Error", 1, 1,
@@ -606,6 +620,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
