@@ -145,6 +145,14 @@ class MainActivity : AppCompatActivity() {
                     Word(
                         1,
                         "",
+                        "Store history and favourite words",
+                        1,
+                        1,
+                        """History of searches is stored. Words can also be starred from notification to be stored as favourite. History and Favourite are accessible from the menu at right top."""
+                    ),
+                    Word(
+                        1,
+                        "",
                         "Read meanings aloud as you read",
                         1,
                         1,

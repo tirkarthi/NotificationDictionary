@@ -38,7 +38,7 @@ class HistoryActivity : AppCompatActivity() {
 
             handler.post {
                 val mRecyclerView = findViewById<RecyclerView>(R.id.historyRecyclerView)
-                val mListadapter = HistoryAdapter(entries, this)
+                val mListadapter = HistoryAdapter(entries as MutableList<HistoryDao.WordWithMeaning>, this, false)
                 mRecyclerView.adapter = mListadapter
                 mRecyclerView.layoutManager = linearLayoutManager
                 mListadapter.notifyItemRangeChanged(1, 100)
