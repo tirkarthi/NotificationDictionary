@@ -114,7 +114,10 @@ open class ProcessIntentActivity : AppCompatActivity() {
             .setTimeoutAfter(NOTIFICATION_TIMEOUT.toLong())
 
         if (definition != "No meaning found") {
-            addCopyButton(word, definition, context, builder)
+            /* https://developer.android.com/reference/android/app/Notification.Builder.html#addAction(android.app.Notification.Action)
+                A notification in its expanded form can display up to 3 actions, from left to right in the order they were added.
+            */
+
             addShareButton(word, definition, context, builder)
             addReadButton(word, definition, context, builder)
             addFavouriteButton(word, context, builder)
@@ -159,45 +162,6 @@ open class ProcessIntentActivity : AppCompatActivity() {
         this.finish()
     }
 
-    private fun addCopyButton(
-        word: String,
-        definition: String,
-        context: Context,
-        builder: NotificationCompat.Builder
-    ) {
-        // Ref : https://stackoverflow.com/questions/14291436/copy-to-clipboard-by-notification-action
-        val notificationCopy: BroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent?) {
-                val clipboard: ClipboardManager =
-                    context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("label", "${word} - ${definition}")
-                clipboard.setPrimaryClip(clip)
-
-                // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
-                try {
-                    context.unregisterReceiver(this)
-                } catch (e: IllegalArgumentException) {
-                    Sentry.captureException(e)
-                    Log.e("Notification Dictionary", "Error in unregistering the receiver")
-                }
-            }
-        }
-
-        val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_COPY")
-        context.registerReceiver(notificationCopy, intentFilter)
-
-        val copy = Intent("com.xtreak.notificationdictionary.ACTION_COPY")
-        val nCopy =
-            PendingIntent.getBroadcast(
-                context,
-                0,
-                copy,
-                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-        builder.addAction(NotificationCompat.Action(null, "Copy", nCopy))
-    }
-
     private fun addShareButton(
         word: String,
         definition: String,
@@ -217,6 +181,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
                 // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
                 try {
                     context.unregisterReceiver(this)
+                    Sentry.captureMessage("Process share event.")
                 } catch (e: IllegalArgumentException) {
                     Sentry.captureException(e)
                     Log.e("Notification Dictionary", "Error in unregistering the receiver")
@@ -277,7 +242,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-        // builder.addAction(NotificationCompat.Action(null, "Read", nRead))
+        builder.addAction(NotificationCompat.Action(null, "Read", nRead))
     }
 
     private fun addFavouriteButton(
@@ -298,10 +263,9 @@ open class ProcessIntentActivity : AppCompatActivity() {
                         historyDao.addFavourite(word)
                     }
                     context.unregisterReceiver(this)
+                    Sentry.captureMessage("Process favourite event.")
                 } catch (e: Exception) {
                     Sentry.captureException(e)
-                    Log.e("ndict", e.toString())
-                    Log.e("Notification Dictionary", "Error in unregistering the receiver")
                 } finally {
                     executor.shutdown()
                 }
@@ -320,7 +284,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
                 PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-        builder.addAction(NotificationCompat.Action(null, "Star", nStar))
+        builder.addAction(NotificationCompat.Action(null, "Favourite", nStar))
     }
 
 

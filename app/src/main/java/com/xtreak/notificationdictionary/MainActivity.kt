@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                         "Store history and favourite words",
                         1,
                         1,
-                        """History of searches is stored. Words can also be starred from notification to be stored as favourite. History and Favourite are accessible from the menu at right top."""
+                        """History of searches is stored. Words can also be starred from notification to be stored as favourite. History and Favourite are accessible from the menu at right top. In case of issues due to update please uninstall and try reinstalling the app since it needs database changes."""
                     ),
                     Word(
                         1,
@@ -165,14 +165,6 @@ class MainActivity : AppCompatActivity() {
                         1,
                         1,
                         """Click on meaning to copy. Long press to share meaning with others. Notifications also have button for these actions."""
-                    ),
-                    Word(
-                        1,
-                        "",
-                        "Multilingual support",
-                        1,
-                        1,
-                        """Languages supported include French, German and Polish."""
                     ),
                     Word(
                         1,
@@ -446,7 +438,7 @@ class MainActivity : AppCompatActivity() {
         // But we don't want the user to cancel this. It's one time and takes a couple of seconds
 
         // TODO: Make this configurable based on environment?
-        val url = "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/dictionary_v2.db.zip"
+        val url = "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/v2/$database_name.zip"
         // val url = "http://192.168.0.105:8000/$database_name.zip" // for local mobile testing
         // val url = "http://10.0.2.2:8000/$database_name.zip" // for local emulator testing
 
