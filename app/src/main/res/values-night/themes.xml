@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">#1F2C37</item>
         <!-- Customize your theme here. -->
         <item name="lexical_category_background_color">#332C2C</item>
         <item name="lexical_category_text_color">#FFFFFF</item>
