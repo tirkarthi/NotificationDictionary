@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Notification Dictionary</string>
+    <string name="channel_name">Λεξικό</string>
+    <string name="channel_description">Ειδοποίηση λεξικού</string>
+    <string name="word">Λέξη</string>
+    <string name="about">Σχετικά</string>
+    <string name="about_description">Το Notification Dictionary είναι μια εφαρμογή για να εμφανίζει την ετυμολογία της επιλεγμένης λέξης ως ειδοποίηση από όλες τις εφαρμογές που υποστηρίζουν επιλογή κειμένου. Η εφαρμογή λειτουργεί εκτός σύνδεσης και χρησιμοποιεί το Wiktionary ως βάση δεδομένων για τις ετυμολογίες. Το Wiktionary είναι ένα έργο ανοιχτού κώδικα χωρίς το οποίο η εφαρμογή δεν θα υπήρχε. Το λογότυπο έγινε χάρη στο liberal Apache license  για εικονίδια of material design. Ευχαριστώ το έργο Thanks to WikDict. Ευχαριστώ όλα τα έργα ανοιχτού κώδικα που βοήθησαν στην ανάπτυξη της εφαρμογής
+    </string>
+    <string name="license">Άδειες</string>
+    <string name="process_text_label">Ετυμολογία</string>
+    <string name="preference_file_key">notification_dictionary</string>
+    <string name="default_database">default_database</string>
+    <string name="selected_language">selected_language</string>
+    <string name="search">Αναζήτηση</string>
+    <string name="manage">Διαχείριση</string>
+    <string name="change_confirmation">Θες να αλλάξεις τη γλώσσα και να κατεβάσεις την βάση δεδομένων αν δεν υπάρχει;</string>
+    <string name="confirmation">Γλώσσα</string>
+    <string name="action_settings">Ρυθμίσεις</string>
+    <string name="history">Ιστορικό</string>
+    <string name="favourite">Αγαπημένα</string>
+</resources>
