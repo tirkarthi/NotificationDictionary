@@ -13,35 +13,101 @@ package com.xtreak.notificationdictionary
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import com.xtreak.notificationdictionary.adapters.HistoryAdapter
 import java.util.concurrent.Executors
 
-class HistoryActivity : AppCompatActivity() {
+class HistoryProvider: PreviewParameterProvider<List<HistoryDao.WordWithMeaning>> {
+    override val values = sequenceOf(
+        listOf(
+            HistoryDao.WordWithMeaning(
+                word = "History",
+                definition = "Something of the past"
+            )
+        )
+    )
+}
+class HistoryActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_history)
+        //setContentView(R.layout.activity_history)
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
 
-        val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+        //val linearLayoutManager = LinearLayoutManager(this)
+        //linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
 
         executor.execute {
             val database = AppDatabase.getDatabase(this)
             val historyDao = database.historyDao()
-            var entries = historyDao.getAllEntriesWithMeaning()
+            val entries = historyDao.getAllEntriesWithMeaning()
 
             handler.post {
-                val mRecyclerView = findViewById<RecyclerView>(R.id.historyRecyclerView)
+               // val mRecyclerView = findViewById<RecyclerView>(R.id.historyRecyclerView)
                 val mListadapter = HistoryAdapter(entries as MutableList<HistoryDao.WordWithMeaning>, this, false)
-                mRecyclerView.adapter = mListadapter
+                /*mRecyclerView.adapter = mListadapter
                 mRecyclerView.layoutManager = linearLayoutManager
-                mListadapter.notifyItemRangeChanged(1, 100)
+                mListadapter.notifyItemRangeChanged(1, 100)*/
+                setContent{
+                    HistoryContent(entries)
+                }
+            }
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview
+fun HistoryContent(@PreviewParameter(HistoryProvider::class) wordsHistory: List<HistoryDao.WordWithMeaning>){
+    MaterialTheme {
+        Scaffold( topBar = {
+            TopAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                title = { Text("History") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }){ innerPadding ->
+            LazyColumn(modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()) {
+                items(wordsHistory) { favorite ->
+                    ElevatedCard(colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        modifier = Modifier.padding(20.dp, 10.dp).fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)){
+                        favorite.word?.let {
+                            Text(modifier = Modifier.padding(10.dp, 3.dp), fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                fontWeight = FontWeight.Medium, text = it) }
+                        favorite.definition?.let {
+                            Text(modifier = Modifier.padding(10.dp, 3.dp), text = it) }
+                    }
+                }
             }
         }
     }

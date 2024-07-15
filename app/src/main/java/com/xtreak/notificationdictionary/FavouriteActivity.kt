@@ -13,36 +13,107 @@ package com.xtreak.notificationdictionary
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.xtreak.notificationdictionary.adapters.HistoryAdapter
 import java.util.concurrent.Executors
 
-class FavouriteActivity : AppCompatActivity() {
+class FavoriteWordProvider: PreviewParameterProvider<List<HistoryDao.WordWithMeaning>> {
+    override val values = sequenceOf(
+        listOf(
+            HistoryDao.WordWithMeaning(
+                isFavourite = 1,
+                word = "Favourite",
+                definition = "Preferred before all others of the same kind."
+            )
+        )
+    )
+}
+class FavouriteActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_favourite)
+        //setContentView(R.layout.activity_favourite)
+            val executor = Executors.newSingleThreadExecutor()
+            val handler = Handler(Looper.getMainLooper())
 
-        val executor = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
+            //val linearLayoutManager = LinearLayoutManager(this)
+            //linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
 
-        val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+            executor.execute {
+                val database = AppDatabase.getDatabase(this)
+                val historyDao = database.historyDao()
+                val entries = historyDao.getAllFavouriteEntriesWithMeaning()
 
-        executor.execute {
-            val database = AppDatabase.getDatabase(this)
-            val historyDao = database.historyDao()
-            var entries = historyDao.getAllFavouriteEntriesWithMeaning()
-
-            handler.post {
-                val mRecyclerView = findViewById<RecyclerView>(R.id.favouriteRecyclerView)
-                val mListadapter = HistoryAdapter(entries as MutableList<HistoryDao.WordWithMeaning>, this, true)
-                mRecyclerView.adapter = mListadapter
-                mRecyclerView.layoutManager = linearLayoutManager
-                mListadapter.notifyItemRangeChanged(1, 100)
+                handler.post {
+                   // val mRecyclerView = findViewById<RecyclerView>(R.id.favouriteRecyclerView)
+                    val mListadapter = HistoryAdapter(
+                        entries as MutableList<HistoryDao.WordWithMeaning>,
+                        this,
+                        true
+                    )
+                    //mRecyclerView.adapter = mListadapter
+                    //mRecyclerView.layoutManager = linearLayoutManager
+                    //mListadapter.notifyItemRangeChanged(1, 100)
+                    setContent {
+                        FavouriteContent(entries)
+                    }
+                }
+            }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview
+fun FavouriteContent(@PreviewParameter(FavoriteWordProvider::class) favorites: List<HistoryDao.WordWithMeaning>) {
+    MaterialTheme {
+        Scaffold( topBar = {
+            TopAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                title = { Text("Favourites") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+    }){ innerPadding ->
+            LazyColumn(modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()) {
+                items(favorites) { favorite ->
+                    ElevatedCard(colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        modifier = Modifier.padding(20.dp, 10.dp).fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 7.dp)){
+                        favorite.word?.let {
+                            Text(modifier = Modifier.padding(10.dp, 3.dp), fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                fontWeight = FontWeight.Medium, text = it) }
+                        favorite.definition?.let {
+                            Text(modifier = Modifier.padding(10.dp, 3.dp), text = it) }
+                    }
+                }
             }
         }
-    }
+}
 }
