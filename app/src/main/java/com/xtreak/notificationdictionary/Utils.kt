@@ -11,7 +11,6 @@
 package com.xtreak.notificationdictionary
 
 import android.util.Log
-import io.sentry.Sentry
 import java.lang.Exception
 import java.util.*
 
@@ -64,7 +63,21 @@ fun addHistoryEntry(
             )
         }
     } catch (e: Exception) {
-        Sentry.captureException(e)
     }
 
+}
+
+// If the last or first letter is a punctuation then remove it.
+fun removePunctuation(word: String): String {
+    var word = word;
+
+    if (!word.last().isLetter()) {
+        word = word.substring(0, word.length - 1)
+    }
+
+    if (!word.first().isLetter()) {
+        word = word.substring(1, word.length - 1)
+    }
+
+    return word
 }
