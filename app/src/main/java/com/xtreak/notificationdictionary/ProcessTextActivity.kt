@@ -11,7 +11,10 @@
 package com.xtreak.notificationdictionary
 
 import android.app.PendingIntent
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
@@ -20,8 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import io.sentry.Sentry
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -38,7 +40,6 @@ private class TTSOnInitListener(
             tts.language = Locale.getDefault()
             Log.d("ndict current locale", Locale.getDefault().language)
             tts.speak("$in_word, $in_definition", TextToSpeech.QUEUE_FLUSH, null)
-            Sentry.captureMessage("Process read event.")
         }
     }
 }
@@ -53,7 +54,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val word: String
+        var word: String
         var lexicalCategory: String = ""
         val context = applicationContext
         val executor = Executors.newSingleThreadExecutor()
@@ -64,6 +65,8 @@ open class ProcessIntentActivity : AppCompatActivity() {
         } else {
             word = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString().lowercase()
         }
+
+        word = removePunctuation(word).toString()
 
 
         // https://stackoverflow.com/questions/1250643/how-to-wait-for-all-threads-to-finish-using-executorservice
@@ -80,7 +83,6 @@ open class ProcessIntentActivity : AppCompatActivity() {
                     addHistoryEntry(historyDao, word)
                 }
             } catch (e: Exception) {
-                Sentry.captureException(e)
                 meaning = Word(
                     1, "", "Error", 1, 1,
                     "There was an error while trying to fetch the meaning. The app tries to download the database at first launch for offline usage." +
@@ -153,7 +155,6 @@ open class ProcessIntentActivity : AppCompatActivity() {
             false
         )
 
-        Sentry.captureMessage("Process text event")
         if (read_definition) {
             TTSOnInitListener(word, definition, context)
         }
@@ -181,16 +182,14 @@ open class ProcessIntentActivity : AppCompatActivity() {
                 // unregister the receiver else they will keep adding themselves to context resulting in duplicate calls
                 try {
                     context.unregisterReceiver(this)
-                    Sentry.captureMessage("Process share event.")
                 } catch (e: IllegalArgumentException) {
-                    Sentry.captureException(e)
                     Log.e("Notification Dictionary", "Error in unregistering the receiver")
                 }
             }
         }
 
         val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_SHARE")
-        context.registerReceiver(notificationShare, intentFilter)
+        context.registerReceiver(notificationShare, intentFilter, RECEIVER_EXPORTED)
 
         val share = Intent("com.xtreak.notificationdictionary.ACTION_SHARE")
         val nShare =
@@ -224,14 +223,13 @@ open class ProcessIntentActivity : AppCompatActivity() {
                 try {
                     context.unregisterReceiver(this)
                 } catch (e: IllegalArgumentException) {
-                    Sentry.captureException(e)
                     Log.e("Notification Dictionary", "Error in unregistering the receiver")
                 }
             }
         }
 
         val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_TTS")
-        context.registerReceiver(notificationRead, intentFilter)
+        context.registerReceiver(notificationRead, intentFilter, RECEIVER_EXPORTED)
 
         val read = Intent("com.xtreak.notificationdictionary.ACTION_TTS")
         val nRead =
@@ -263,9 +261,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
                         historyDao.addFavourite(word)
                     }
                     context.unregisterReceiver(this)
-                    Sentry.captureMessage("Process favourite event.")
                 } catch (e: Exception) {
-                    Sentry.captureException(e)
                 } finally {
                     executor.shutdown()
                 }
@@ -273,7 +269,7 @@ open class ProcessIntentActivity : AppCompatActivity() {
         }
 
         val intentFilter = IntentFilter("com.xtreak.notificationdictionary.ACTION_FAVOURITE")
-        context.registerReceiver(notificationFavourite, intentFilter)
+        context.registerReceiver(notificationFavourite, intentFilter, RECEIVER_EXPORTED)
 
         val star = Intent("com.xtreak.notificationdictionary.ACTION_FAVOURITE")
         val nStar =

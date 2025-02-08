@@ -18,13 +18,22 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Switch
+import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -33,17 +42,19 @@ import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.huxq17.download.Pump
-import com.huxq17.download.config.DownloadConfig
-import com.huxq17.download.core.DownloadListener
 import com.mikepenz.aboutlibraries.LibsBuilder
-import com.suddenh4x.ratingdialog.AppRating
-import com.suddenh4x.ratingdialog.preferences.RatingThreshold
+import com.tonyodev.fetch2.AbstractFetchListener
+import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Error
+import com.tonyodev.fetch2.Fetch.Impl.getInstance
+import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2.NetworkType
+import com.tonyodev.fetch2.Priority
+import com.tonyodev.fetch2.Request
 import de.cketti.library.changelog.ChangeLog
-import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.zip.ZipFile
 
@@ -188,7 +199,6 @@ class MainActivity : AppCompatActivity() {
 
         initialize_spinner(database_name)
         // show_changelog()
-        show_rating()
         onNewIntent(intent)
 
         // Request notification permission in Android 33+
@@ -351,16 +361,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun show_rating() {
-        AppRating.Builder(this)
-            .setMinimumLaunchTimes(10)
-            .setMinimumDays(2)
-            .setMinimumLaunchTimesToShowAgain(15)
-            .setMinimumDaysToShowAgain(10)
-            .setRatingThreshold(RatingThreshold.FIVE)
-            .showIfMeetsConditions()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu, menu)
@@ -404,16 +404,19 @@ class MainActivity : AppCompatActivity() {
                 val about_activity = Intent(applicationContext, AboutActivity::class.java)
                 startActivityForResult(about_activity, 0)
             }
+
             R.id.license -> {
                 LibsBuilder()
                     .withActivityTitle("Open Source Licenses")
                     .withLicenseShown(true)
                     .start(this)
             }
+
             R.id.history -> {
                 val history_activity = Intent(applicationContext, HistoryActivity::class.java)
                 startActivityForResult(history_activity, 0)
             }
+
             R.id.favourite -> {
                 val favourite_activity = Intent(applicationContext, FavouriteActivity::class.java)
                 startActivityForResult(favourite_activity, 0)
@@ -438,7 +441,8 @@ class MainActivity : AppCompatActivity() {
         // But we don't want the user to cancel this. It's one time and takes a couple of seconds
 
         // TODO: Make this configurable based on environment?
-        val url = "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/v2/$database_name.zip"
+        val url =
+            "https://xtreak.sfo3.cdn.digitaloceanspaces.com/dictionaries/v2/$database_name.zip"
         // val url = "http://192.168.0.105:8000/$database_name.zip" // for local mobile testing
         // val url = "http://10.0.2.2:8000/$database_name.zip" // for local emulator testing
 
@@ -447,65 +451,69 @@ class MainActivity : AppCompatActivity() {
             Environment.getDataDirectory().absolutePath + "/data/" + packageName
         val zip_path = File("$package_data_directory/$database_name.zip").absolutePath
 
-        // https://github.com/huxq17/Pump/blob/master/kotlin_app/src/main/java/com/huxq17/download/demo/MainActivity.kt
-        DownloadConfig.newBuilder()
-            .setMaxRunningTaskNum(1)
-            .setMinUsableStorageSpace(140 * 1024L * 1024) // 140MB as per database size
+        val fetchConfiguration: FetchConfiguration = FetchConfiguration.Builder(this)
+            .setDownloadConcurrentLimit(3)
             .build()
+
+        val fetch = getInstance(fetchConfiguration)
+        val request: Request = Request(url, zip_path)
+        request.priority = Priority.HIGH
+        request.networkType = NetworkType.ALL
         progressDialog.progress = 0
         progressDialog.show()
-        Pump.newRequest(url, zip_path)
-            .listener(object : DownloadListener() {
+        fetch.addListener(object : AbstractFetchListener() {
 
-                override fun onProgress(progress: Int) {
-                    progressDialog.progress = progress
+            fun copy_and_unzip(source: String, destination: String) {
+                val zipfile = ZipFile(source)
+                val entry = zipfile.entries().toList().first()
+
+                // The zip file only has one entry which is the database. So use it as an
+                // input stream and copy the unzipped file to output stream. Delete the source
+                // zip file to save space.
+                val input_stream = zipfile.getInputStream(entry)
+                val output_stream = FileOutputStream(destination)
+                input_stream.copyTo(output_stream, 1024 * 1024 * 2)
+                File(zip_path).delete()
+            }
+
+            override fun onCompleted(download: Download) {
+                val destination_folder = File("$package_data_directory/databases")
+                val destination_path =
+                    File("$package_data_directory/databases/$database_name").absolutePath
+                val source_path = download.file
+
+                if (!destination_folder.exists()) {
+                    destination_folder.mkdirs()
                 }
 
-                fun copy_and_unzip(source: String, destination: String) {
-                    val zipfile = ZipFile(source)
-                    val entry = zipfile.entries().toList().first()
+                copy_and_unzip(source_path, destination_path)
+                progressDialog.dismiss()
+                Snackbar.make(
+                    findViewById(R.id.mainLayout),
+                    "Download finished",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
 
-                    // The zip file only has one entry which is the database. So use it as an
-                    // input stream and copy the unzipped file to output stream. Delete the source
-                    // zip file to save space.
-                    val input_stream = zipfile.getInputStream(entry)
-                    val output_stream = FileOutputStream(destination)
-                    input_stream.copyTo(output_stream, 1024 * 1024 * 2)
-                    File(zip_path).delete()
-                }
+            override fun onError(download: Download, error: Error, throwable: Throwable?) {
+                progressDialog.dismiss()
+                Snackbar.make(
+                    findViewById(R.id.mainLayout),
+                    "Download failed. Please check your internet connection and relaunch the app.",
+                    Snackbar.LENGTH_INDEFINITE
+                ).show()
+            }
 
-                override fun onSuccess() {
-                    val destination_folder = File("$package_data_directory/databases")
-                    val destination_path =
-                        File("$package_data_directory/databases/$database_name").absolutePath
-                    val source_path = downloadInfo.filePath
+            override fun onProgress(
+                download: Download,
+                etaInMilliseconds: Long,
+                downloadedBytesPerSecond: Long
+            ) {
+                progressDialog.progress = download.progress
+            }
+        })
 
-                    if (!destination_folder.exists()) {
-                        destination_folder.mkdirs()
-                    }
-
-                    copy_and_unzip(source_path, destination_path)
-                    progressDialog.dismiss()
-                    Snackbar.make(
-                        findViewById(R.id.mainLayout),
-                        "Download finished",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }
-
-                override fun onFailed() {
-                    progressDialog.dismiss()
-                    Snackbar.make(
-                        findViewById(R.id.mainLayout),
-                        "Download failed. Please check your internet connection and relaunch the app.",
-                        Snackbar.LENGTH_INDEFINITE
-                    ).show()
-                }
-            })
-            .forceReDownload(false)
-            .threadNum(3)
-            .setRetry(3, 200)
-            .submit()
+        fetch.enqueue(request)
     }
 
     override fun onDestroy() {
@@ -571,7 +579,8 @@ class MainActivity : AppCompatActivity() {
         // https://stackoverflow.com/questions/18414804/android-edittext-remove-focus-after-clicking-a-button
         wordEdit.clearFocus()
 
-        val word = wordEdit.text.toString().trim().lowercase()
+        var word = wordEdit.text.toString().trim().lowercase()
+        word = removePunctuation(word).toString()
 
         val executor = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
@@ -588,7 +597,6 @@ class MainActivity : AppCompatActivity() {
                     addHistoryEntry(historyDao, word)
                 }
             } catch (e: Exception) {
-                Sentry.captureException(e)
                 Log.d("ndict:", e.toString())
                 meanings = listOf(
                     Word(
@@ -603,7 +611,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 resolveRedirectMeaning(meanings, dao)
             } catch (e: Exception) {
-                Sentry.captureException(e)
+                Log.d("ndict", e.toString())
             }
 
             handler.post {
