@@ -1,146 +1,54 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="AndroidLintAcceptsUserCertificates" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAllCaps" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAllowAllHostnameVerifier" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAllowBackup" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintAndroidGradlePluginVersion" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintApplySharedPref" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAuthLeak" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintBadHostnameVerifier" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintBlockedPrivateApi" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintButtonCase" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintCanvasSize" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintCheckResult" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintContentDescription" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintCustomViewStyleable" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDataBindingWithoutKapt" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintDefaultLocale" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDeletedProvider" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintDeprecated" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDeprecatedProvider" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDevModeObsolete" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDeviceAdmin" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintDiscouragedPrivateApi" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDuplicateIds" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDuplicateIncludedIds" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDuplicatePlatformClasses" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintDuplicateUsesFeature" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintEnqueueWork" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintExportedContentProvider" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintExportedService" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintExtraText" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintFindViewByIdCast" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintGetInstance" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGetLocales" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGifUsage" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGradleDependency" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGradleDeprecated" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintGradleDeprecatedConfiguration" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintGradleOverrides" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGradlePath" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGrantAllUris" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintGridLayout" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintHardwareIds" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintIconDensities" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintIconDuplicatesConfig" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintIconExtension" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintIgnoreWithoutReason" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintIncludeLayoutParam" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintIncompatibleMediaBrowserServiceCompatVersion" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInconsistentArrays" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInefficientWeight" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInlinedApi" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInsecureBaseConfiguration" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInstantApps" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintIntentReset" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInvalidId" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInvalidImeActionId" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintInvalidNavigation" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInvalidUsesTagAttribute" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintInvalidVectorPath" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintJcenterRepositoryObsolete" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintJobSchedulerService" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintKeyboardInaccessibleWidget" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintKtxExtensionAvailable" enabled="false" level="INFO" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintLocaleFolder" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintLogTagMismatch" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintManifestOrder" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintManifestResource" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintMediaCapabilities" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintMissingLeanbackLauncher" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintMissingPermission" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintMissingPrefix" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintMissingQuantity" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintMissingSuperCall" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintMissingVersion" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintMockLocation" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintNamespaceTypo" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintNonConstantResourceId" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintNonResizeableActivity" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintNotInterpolated" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintNotificationIconCompatibility" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintNotifyDataSetChanged" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintObsoleteLayoutParam" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintOverride" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintPackageManagerGetSignatures" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintPackagedPrivateKey" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintParcelCreator" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintPluralsCandidate" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintPrivateApi" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintProguardSplit" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintProtectedPermissions" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintRange" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintRelativeOverlap" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintRemoteViewLayout" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintRequiredSize" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintResAuto" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintRiskyLibrary" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintRtlHardcoded" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintSSLCertificateSocketFactoryGetInsecure" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintScrollViewCount" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintSecureRandom" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintServiceCast" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintSetTextI18n" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintSetWorldReadable" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintShowToast" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintSlices" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintSmallSp" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintSoonBlockedPrivateApi" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintSourceLockedOrientationActivity" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintStringFormatCount" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintStringShouldBeInt" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintSuspicious0dp" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintSuspiciousImport" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintTrustAllX509TrustManager" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintTypographyDashes" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintTypographyOther" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintTypos" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUnknownIdInLayout" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUnlocalizedSms" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUnprotectedSMSBroadcastReceiver" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUnsafeDynamicallyLoadedCode" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUnsupportedChromeOsCameraSystemFeature" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintUntranslatable" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintUseCheckPermission" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUseCompoundDrawables" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUseOfBundledGooglePlayServices" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUseSparseArrays" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUseValueOf" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintUsesMinSdkAttributes" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintUsingC2DM" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintValidRestrictions" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintVectorDrawableCompat" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintViewConstructor" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintViewHolder" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintWearStandaloneAppFlag" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintWebViewLayout" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintWeekBasedYear" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintWifiManagerPotentialLeak" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintWorldReadableFiles" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintWorldWriteableFiles" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintWrongFolder" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintWrongViewCast" enabled="false" level="ERROR" enabled_by_default="false" />
   </profile>
 </component>
